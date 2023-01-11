@@ -6,6 +6,7 @@ cryptography==39.0.0
 defusedxml==0.7.1
 Django==3.2.16
 django-allauth==0.52.0
+django-crispy-forms==1.14.0
 flake8==6.0.0
 idna==3.4
 mccabe==0.7.0

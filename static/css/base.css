@@ -1,0 +1,60 @@
+* {
+    box-sizing: border-box;
+    transition: 0.2s all;
+    font-family: 'Nunito', sans-serif;
+}
+
+.bg-light-grey {
+    background-color: #aaaaaa;
+}
+
+.bg-cherry {
+    background-image: linear-gradient(#86424d, #401c20);
+}
+
+.text-cherry {
+    color: #401c20;
+}
+
+body {
+    padding-top: 56px;
+    height: 100vh;
+}
+
+a, a:hover {
+    text-decoration: none;
+    color: black;
+}
+
+.site-header {
+    height: 70px;
+}
+
+/* These elements style the puzzle_interface.html template */ 
+
+.puzzle-grid {
+    display: grid;
+    grid-auto-rows: 30px;
+}
+
+.blank-square, .null-square {
+    position: relative;
+}
+
+.blank-square {
+    background-color: white;
+    color: black;
+    box-sizing: border-box;
+    border: 1px solid black;
+}
+
+.null-square {
+    background-color: black;
+}
+
+.superscript {
+    font-size: 0.4rem;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+}

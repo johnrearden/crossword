@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col">
+            <form method="GET" action="{% url 'query_word' %}">
+                <input type="text" name="q" placeholder="Enter word string">
+                <button type="submit">Submit Query</button>
+            </form>
+            <textarea id="results" rows="10" cols="100">{{ results }}</textarea>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
