@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from .models import DictionaryWord
+from django.shortcuts import render, get_object_or_404
+from .models import DictionaryWord, DictionaryDefinition
 from django.views import View
 
 
@@ -11,7 +11,6 @@ class GetMatchingWord(View):
             for i, char in enumerate(string):
                 if char != '_':
                     known_chars.append((i, char))
-            print(known_chars)
 
             length = len(string)
             result_list = []
@@ -25,11 +24,24 @@ class GetMatchingWord(View):
                         match = False
                         break
                 if match:
-                    result_list.append(candidate.string)
+                    result_list.append(candidate)
+            result_list.sort(key=DictionaryWord.get_frequency, reverse=True)
+            words = [d_word.string for d_word in result_list]
 
             context = {
-                'results': result_list,
+                'results': words,
             }
         else:
             context = {}
+        return render(request, 'builder/temp.html', context)
+
+
+class GetDefinition(View):
+    def get(self, request):
+        context = {}
+        query = request.GET['def']
+        if 'def' in request.GET:
+            d_word = get_object_or_404(DictionaryWord, string=query)
+            definitions = DictionaryDefinition.objects.filter(word=d_word)
+            context['def_results'] = definitions
         return render(request, 'builder/temp.html', context)

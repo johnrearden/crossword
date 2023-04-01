@@ -47,6 +47,9 @@ class DictionaryWord(models.Model):
     length = models.IntegerField()
     frequency = models.IntegerField()
 
+    def get_frequency(self):
+        return self.frequency
+
     def __str__(self):
         return (f'DictionaryEntry : {self.string}, len={self.length}'
                 f', freq={self.frequency}')
