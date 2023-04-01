@@ -41,7 +41,12 @@ class GetDefinition(View):
         context = {}
         query = request.GET['def']
         if 'def' in request.GET:
-            d_word = get_object_or_404(DictionaryWord, string=query)
-            definitions = DictionaryDefinition.objects.filter(word=d_word)
-            context['def_results'] = definitions
+            words = DictionaryWord.objects.filter(string=query)
+            def_list = []
+            for word in words:
+                definitions = DictionaryDefinition.objects.filter(word=word)
+                for defn in definitions:
+                    def_list.append(defn.definition)
+
+            context['def_results'] = def_list or ['Sorry, no definitions found']
         return render(request, 'builder/temp.html', context)

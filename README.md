@@ -36,3 +36,8 @@ with the loopback address 127.0.0.1. Finally `sudo hostname {new computer name}`
 - create the database : `CREATE DATABASE crosswordbackend WITH OWNER={architect};`
 - exit from postgres shell and run database migrations : `python3 manage.py migrate`
 - Good to go!
+
+## Populate the database
+- In the project's root directory, enter the Django shell : `python3 manage.py shell`
+- Import the db_filler module : `from data_ore import db_filler`
+- Fill that db! : `db_filler.fill()`

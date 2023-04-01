@@ -16,10 +16,14 @@
                 <input type="text" name="def" placeholder="Enter word string">
                 <button type="submit">Submit Query</button>
             </form>
-            <textarea id="results" rows="10" cols="100">{{ def_results }}</textarea>
+            <h3 class="mt-3">Definitions:</h3>
+            <div class="border p-2">
+                {% for def in def_results %}
+                <p>{{ def }}</p>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
 
 {% endblock %}
-
