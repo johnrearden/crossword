@@ -17,6 +17,13 @@ with the loopback address 127.0.0.1. Finally `sudo hostname {new computer name}`
 - Ensure python3.8 is installed with `python3 --version`
 - Install pip3 with `sudo apt install python3-pip`
 
+## Acquire a domain name.
+- This project used [LetsHost](https://www.letshostbilling.com/clientarea.php)
+- Grab a domain name; pay for it.
+- Nav to My Domains - Manage DNS and add a record, entering the domain name and IP address
+- Nav to Nameservers and change them as detailed [here](https://www.letshostbilling.com/index.php?rp=/knowledgebase/39/How-do-I-edit-the-DNS-record-for-my-domain.html)
+- Wait patiently for the world to notice your DNS record.
+
 ## Clone the repo
 - run `git clone https://github.com/johnrearden/crossword.git`
 - install python3.8-venv `sudo apt install python3.8-venv`

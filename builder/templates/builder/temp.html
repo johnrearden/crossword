@@ -9,7 +9,7 @@
                 <input type="text" name="q" placeholder="Enter word string">
                 <button type="submit">Submit Query</button>
             </form>
-            <textarea id="results" rows="10" cols="100">{{ results }}</textarea>
+            <textarea id="results" rows="20" cols="50">{{ results }}</textarea>
         </div>
         <div class="col-6">
             <form method="GET" action="{% url 'query_definition' %}">
@@ -22,8 +22,14 @@
                 <p>{{ def }}</p>
                 {% endfor %}
             </div>
+            <span id="changeme">Tester</span>
         </div>
     </div>
 </div>
 
+{% endblock %}
+
+{% block postloadjs %}
+{{ block.super }}
+<script src="{% static 'js/tester.js' %}"></script>
 {% endblock %}

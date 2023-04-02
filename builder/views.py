@@ -14,7 +14,8 @@ class GetMatchingWord(View):
 
             length = len(string)
             result_list = []
-            full_list = DictionaryWord.objects.filter(length=length)
+            full_list = DictionaryWord.objects.filter(length=length) \
+                .order_by('frequency')
             for candidate in full_list:
                 match = True
                 for tup in known_chars:

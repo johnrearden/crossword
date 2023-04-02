@@ -29,8 +29,8 @@ SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.environ.get('DEBUG') == 'True' else False
 
-SERVER_HOSTNAME = os.environ['SERVER_HOSTNAME'] or ''
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', SERVER_HOSTNAME]
+SERVER_HOSTNAMES = os.environ['SERVER_HOSTNAMES'] or ''
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', *SERVER_HOSTNAMES]
 
 
 # Application definition
@@ -135,6 +135,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+if DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+else:
+    STATIC_ROOT = '/var/www/fruzzled/static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
