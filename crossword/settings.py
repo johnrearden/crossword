@@ -32,6 +32,12 @@ DEBUG = True if os.environ.get('DEBUG') == 'True' else False
 SERVER_HOSTNAMES = os.environ['SERVER_HOSTNAMES'].split(',') or ''
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', *SERVER_HOSTNAMES]
 
+# Add HSTS header
+SECURE_HSTS_SECONDS = 30  # Unit is seconds; *USE A SMALL VALUE FOR TESTING!*
+SECURE_HSTS_PRELOAD = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 
 # Application definition
 
