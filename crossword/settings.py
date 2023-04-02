@@ -73,13 +73,15 @@ MIDDLEWARE = [
 
 # Add Content-Security-Policy Header
 # Requires django-csp
-MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
+
+# *********************** Enable and populate whitelist in production!!!!
+""" MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
 CSP_STYLE_SRC = [
     "'self'",
     "cdn.jsdelivr.net",
     "fonts.googleapis.com",
     "fonts.gstatic.com"
-]
+] """
 
 ROOT_URLCONF = 'crossword.urls'
 
