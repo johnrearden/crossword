@@ -38,6 +38,9 @@ SECURE_HSTS_PRELOAD = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Add Referrer-Policy Header
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 
 # Application definition
 
@@ -67,6 +70,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Add Content-Security-Policy Header
+# Requires django-csp
+MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
 
 ROOT_URLCONF = 'crossword.urls'
 
