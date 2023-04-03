@@ -48,3 +48,10 @@ with the loopback address 127.0.0.1. Finally `sudo hostname {new computer name}`
 - In the project's root directory, enter the Django shell : `python3 manage.py shell`
 - Import the db_filler module : `from data_ore import db_filler`
 - Fill that db! : `db_filler.fill()`
+
+## Web serving
+- Configure nginx as in the [Real Python tutorial](#real-python-tutorial) above.
+- Configure gunicorn as a systemd service as in the [gunicorn docs](https://docs.gunicorn.org/en/stable/deploy.html)
+
+## Important config files
+- /etc/nginx/sites-available/fruzzled
