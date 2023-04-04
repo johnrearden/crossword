@@ -55,3 +55,10 @@ with the loopback address 127.0.0.1. Finally `sudo hostname {new computer name}`
 
 ## Important config files
 - /etc/nginx/sites-available/fruzzled
+
+
+
+---
+
+# Credits
+[Fill a dynamic CSS grid using Javascript and CSS variables](https://stackoverflow.com/questions/57550082/creating-a-16x16-grid-using-javascript)

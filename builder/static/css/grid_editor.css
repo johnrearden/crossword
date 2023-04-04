@@ -1,0 +1,48 @@
+:root {
+    --grid-cols: 10;
+    --grid-rows: 10;
+}
+
+#grid-editor-div {
+    display: grid;
+    grid-template-rows: repeat(var(--grid-rows), 3rem);
+    grid-template-columns: repeat(var(--grid-cols), 3rem);
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.blank {
+    background-color: black;
+}
+
+.open {
+    font-family: sans-serif;
+    background-color: white;
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+    position: relative;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 2.3rem;
+    line-height: 3rem;
+}
+
+.open:hover {
+    border: 1px solid blue;
+    background-color: #0000ff55;
+}
+
+.blank:hover {
+    border: 1px solid blue;
+    background-color: #0000ffcc;
+}
+
+.numbered {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    font-size: 0.6rem;
+    line-height: 0.6rem;
+}
+
+
