@@ -12,13 +12,13 @@ class CrosswordPuzzleAdmin(admin.ModelAdmin):
 
 
 class CrosswordClueAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'clue', 'solutions', 'word_lengths', 'orientation',
+    list_display = ('pk', 'clue', 'solution', 'word_lengths', 'orientation',
                     'start_col', 'start_row', 'created_on', 'creator',
                     'puzzle',)
     list_editable = ('clue', 'solution', 'word_lengths', 'orientation',
                      'start_col', 'start_row',)
 
 
-admin.register(Grid, GridAdmin)
-admin.register(CrosswordPuzzle, CrosswordPuzzleAdmin)
-admin.register(CrosswordClue, CrosswordClueAdmin)
+admin.site.register(Grid, GridAdmin)
+admin.site.register(CrosswordPuzzle, CrosswordPuzzleAdmin)
+admin.site.register(CrosswordClue, CrosswordClueAdmin)

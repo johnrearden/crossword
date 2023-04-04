@@ -70,13 +70,13 @@ class CrosswordClue(models.Model):
         orientation."""
     puzzle = models.ForeignKey(CrosswordPuzzle, on_delete=models.SET_NULL,
                                related_name='clues', null=True)
-    clue = models.CharField(max_length=1024)
+    clue = models.CharField(max_length=1024, null=True, blank=True)
     solution = models.CharField(max_length=127)
-    word_lengths = models.CharField(max_length=64)
+    word_lengths = models.CharField(max_length=64, null=True, blank=True)
     orientation = models.CharField(max_length=2, choices=Orientation.choices,
                                    default=Orientation.ACROSS)
-    start_row = models.IntegerField()
-    start_col = models.IntegerField()
+    start_row = models.IntegerField(null=True, blank=True)
+    start_col = models.IntegerField(null=True, blank=True)
     created_on = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
                                 related_name="created_clues")
