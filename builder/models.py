@@ -35,6 +35,7 @@ class CrosswordPuzzle(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
                                 related_name='grid_creator')
+    complete = models.BooleanField(default=False)
 
     def __str__(self):
         return (f'Puzzle by {self.creator} ({self.created_on}'
