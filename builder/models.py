@@ -26,14 +26,14 @@ class Grid(models.Model):
                 f'{self.created_on} by {self.creator}.')
 
 
-class Puzzle(models.Model):
+class CrosswordPuzzle(models.Model):
     """
     A puzzle consists of a grid, with related puzzle words.
     """
     grid = models.ForeignKey(Grid, on_delete=models.CASCADE,
                              related_name='puzzles')
     created_on = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE,
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
                                 related_name='grid_creator')
 
     def __str__(self):
@@ -55,32 +55,6 @@ class DictionaryWord(models.Model):
                 f', freq={self.frequency}')
 
 
-class Clue(models.Model):
-    """ A clue has a many-to-one relationship with a dictionary word """
-    word = models.ForeignKey(DictionaryWord, on_delete=models.CASCADE,
-                             related_name='clues')
-    clue_string = models.CharField(max_length=200)
-
-    def __str__(self):
-        return f'Clue for "{self.word.string}" : {self.clue_string}'
-
-
-class PuzzleWord(models.Model):
-    """ An element of a puzzle, with an initially blank string """
-    word = models.ForeignKey(DictionaryWord, on_delete=models.CASCADE,
-                             related_name='puzzle_words')
-    puzzle = models.ForeignKey(Puzzle, on_delete=models.CASCADE,
-                               related_name='puzzle_words')
-    string = models.CharField(max_length=50, null=False, blank=True,
-                              default='')
-    orientation = models.CharField(max_length=2, choices=Orientation.choices,
-                                   default=Orientation.ACROSS)
-
-    def __str__(self):
-        return (f'Word from puzzle {self.puzzle} : {self.string}'
-                f' ({self.orientation})')
-
-
 class DictionaryDefinition(models.Model):
     definition = models.TextField(max_length=1024)
     word = models.ForeignKey(DictionaryWord, on_delete=models.CASCADE,
@@ -88,3 +62,24 @@ class DictionaryDefinition(models.Model):
 
     def __str__(self):
         return f'Definition of {self.word.string} : {self.definition}'
+
+
+class CrosswordClue(models.Model):
+    """ A clue comprises a clue string, a solution string, a format string,
+        a containing puzzle, a start location within that puzzle, and an
+        orientation."""
+    puzzle = models.ForeignKey(CrosswordPuzzle, on_delete=models.SET_NULL,
+                               related_name='clues', null=True)
+    clue = models.CharField(max_length=1024)
+    solution = models.CharField(max_length=127)
+    word_lengths = models.CharField(max_length=64)
+    orientation = models.CharField(max_length=2, choices=Orientation.choices,
+                                   default=Orientation.ACROSS)
+    start_row = models.IntegerField()
+    start_col = models.IntegerField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
+                                related_name="created_clues")
+
+    def __str__(self):
+        return f'{self.solution}" : {self.clue} ({self.word_lengths})'
