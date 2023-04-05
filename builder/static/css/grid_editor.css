@@ -17,7 +17,6 @@
 
 .open {
     font-family: sans-serif;
-    background-color: white;
     border-left: 1px solid black;
     border-top: 1px solid black;
     position: relative;
@@ -43,6 +42,15 @@
     left: 1px;
     font-size: 0.6rem;
     line-height: 0.6rem;
+}
+
+.highlighted-cell {
+    border : 3px solid red;
+}
+
+.highlighted-clue {
+    
+    background-color: #ffa50050;
 }
 
 

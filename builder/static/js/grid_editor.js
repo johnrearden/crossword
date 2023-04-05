@@ -1,4 +1,6 @@
 let grid;
+let currentHighlightedCell;
+let currentHighlightedClue;
 const OPEN = '#';
 const CLOSED = '-';
 
@@ -33,11 +35,52 @@ const drawGrid = (grid) => {
             cellDiv.appendChild(span);
         }
         cellDiv.addEventListener('click', (event) => {
-            event.target.classList.toggle('open');
-            event.target.classList.toggle('blank');
-            const cellIndex = event.target.id.split('-')[1];
-            cells[cellIndex].value = cells[cellIndex].value === OPEN ? CLOSED : OPEN;
-            grid.reindex();
+            if (!isEditingLayout()) {
+                const clickedCellIndex = event.target.id.split('-')[1];
+                const clickedCell = cells[clickedCellIndex];
+
+                // Remove highlighting from previous cell and clue.
+                if (currentHighlightedClue) {
+                    const cells = getClueCells(currentHighlightedClue, grid);
+                    for (let cell of cells) {
+                        const index = getCellIndex(cell, grid);
+                        const cellDiv = document.getElementById(`cellDiv-${index}`);
+                        cellDiv.classList.remove('highlighted-cell', 'highlighted-clue');
+                    }
+                }
+
+                // Highlight the current cell and clue. Toggle the down and across clues if both
+                // exist.
+                let currentClue = null;
+                if (currentHighlightedCell == clickedCell) {
+                    if (currentHighlightedClue.orientation === 'AC' && clickedCell.clueDown) {
+                        currentClue = clickedCell.clueDown;
+                    } else if (currentHighlightedClue.orientation === 'DN' && clickedCell.clueAcross) {
+                        currentClue = clickedCell.clueAcross;
+                    }
+                } else {
+                    currentClue = clickedCell.clueAcross || clickedCell.clueDown;
+                }
+                
+                const cellsToHighlight = getClueCells(currentClue, grid);
+                for (let cell of cellsToHighlight) {
+                    const index = getCellIndex(cell, grid);
+                    const cellDiv = document.getElementById(`cellDiv-${index}`);
+                    cellDiv.classList.add('highlighted-clue');
+                }
+                const cellDiv = document.getElementById(`cellDiv-${clickedCellIndex}`);
+                cellDiv.classList.add('highlighted-cell');
+                currentHighlightedClue = currentClue;
+                currentHighlightedCell = clickedCell;
+
+
+            } else {
+                event.target.classList.toggle('open');
+                event.target.classList.toggle('blank');
+                const cellIndex = event.target.id.split('-')[1];
+                cells[cellIndex].value = cells[cellIndex].value === OPEN ? CLOSED : OPEN;
+                grid.reindex();
+            }
         });
         gridDiv.appendChild(cellDiv);
     }
@@ -132,7 +175,7 @@ class Grid {
                 const sharedClue = this.cells[i - 1].clueAcross;
                 sharedClue.len += 1;
                 this.cells[i].clueAcross = sharedClue;
-                
+
             }
 
             // If cell has no top neighbour, but has a bottom neighbour, 
@@ -205,6 +248,43 @@ const hasBottomNeighbour = (cell, grid) => {
 const getCellIndex = (cell, grid) => {
     return cell.col + cell.row * grid.width;
 }
+
+const getClueCells = (clue, grid) => {
+
+    if (!clue) {
+        return [];
+    }
+
+    // Calculate the clue indices.
+    const clueCellIndices = [];
+    if (clue.orientation === 'AC') {
+        const row = clue.startRow;
+        for (let i = clue.startCol; i < clue.startCol + clue.len; i++) {
+            clueCellIndices.push(row * grid.width + i);
+        }
+    } else if (clue.orientation === 'DN') {
+        const col = clue.startCol;
+        for (let i = clue.startRow; i < clue.startRow + clue.len; i++) {
+            clueCellIndices.push(col + i * grid.width);
+        }
+    }
+
+    // Return the cells corresponding to these indices
+    const cells = []
+    for (let i of clueCellIndices) {
+        cells.push(grid.cells[i]);
+    }
+    return cells;
+}
+
+// Check if the user has selected the layout editor checkbox on the page
+const isEditingLayout = () => {
+    const checkbox = document.getElementById('layout-editor-checkbox');
+    console.log(checkbox.checked);
+    return checkbox.checked;
+}
+
+
 
 
 
