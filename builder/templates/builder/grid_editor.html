@@ -14,14 +14,20 @@
         </div>
         <div class="col border text-left">
             <div class="row">
-                <div class="col-12 col-lg-4">
+                <div class="col">
                     <h3>Current Clue</h3>
                     <div id="current-clue-div"></div>
                 </div>
-                <div class="col-12 col-lg-8">
+                <div class="col">
                     <h3>Definition</h3>
                     <div id="current-definition-div">
-                        <input type="text" class="p-2" id="def-input"></input>
+                        <input type="text" class="p-2" id="def-input">
+                    </div>
+                </div>
+                <div class="col">
+                    <h3>Word Lngt</h3>
+                    <div>
+                        <input type="text" class="p-2" id="word-lengths-input">
                     </div>
                 </div>
             </div>
@@ -34,9 +40,12 @@
         </div>
     </div>
     <div class="row border mt-5 justify-content-center">
-        <div class="col-auto">
+        <div class="col">
             <label for="layout-editor-checkbox">Edit Layout</label>
             <input type="checkbox" id="layout-editor-checkbox">
+        </div>
+        <div class="col">
+            <button id="save-button">Save</button>
         </div>
     </div>
 </div>

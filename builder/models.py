@@ -72,6 +72,7 @@ class CrosswordClue(models.Model):
     puzzle = models.ForeignKey(CrosswordPuzzle, on_delete=models.SET_NULL,
                                related_name='clues', null=True)
     clue = models.CharField(max_length=1024, null=True, blank=True)
+    clue_number = models.IntegerField()
     solution = models.CharField(max_length=127)
     word_lengths = models.CharField(max_length=64, null=True, blank=True)
     orientation = models.CharField(max_length=2, choices=Orientation.choices,

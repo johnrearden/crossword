@@ -27,23 +27,37 @@ const drawGrid = (grid) => {
         grid.onKeyup(event);
     })
 
+    document.getElementById('save-button').addEventListener('click', (event) => {
+        const list = [];
+        for (let clue of grid.clues) {
+            list.push(clue.convertToObject());
+        }
+        console.log(JSON.stringify(
+            {'clues': list}
+        ));
+    });
+
     document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {
         unSelectCurrentClue(event);
         grid.currentHighlightedCell = null;
         grid.currentHighlightedClue = null;
 
         if (!event.target.checked) {
+            console.log('clearing numbers');
             clearExistingClueNumbers();
             grid.reindex();
+            console.log('rendering new numbers');
             rerenderClueNumbers();
         }
     });
 
     document.getElementById('def-input').addEventListener('input', (event) => {
-        grid.currentHighlightedClue.solution = event.target.value;
-        const temp = JSON.stringify(grid.currentHighlightedClue);
-        console.log(temp);
+        grid.currentHighlightedClue.clue = event.target.value;
     });
+
+    document.getElementById('word-lengths-input').addEventListener('input', (e) => {
+        grid.currentHighlightedClue.word_lengths = e.target.value;
+    })
 
     document.getElementById('matches-button').addEventListener('click', (event) => {
 
@@ -103,7 +117,9 @@ const drawGrid = (grid) => {
                 event.target.classList.toggle('open');
                 event.target.classList.toggle('blank');
                 const cellIndex = event.target.id.split('-')[1];
-                cells[cellIndex].value = cells[cellIndex].value === OPEN ? CLOSED : OPEN;
+                cells[cellIndex].value = cells[cellIndex].value === CLOSED ? OPEN : CLOSED;
+
+                console.log(`cell at ${cellIndex} is now ${cells[cellIndex].value}`);
 
                 // Reindex the grid, clearing the clue numbers beforehand, and rendering the new ones
                 // afterwards
@@ -112,7 +128,10 @@ const drawGrid = (grid) => {
                 rerenderClueNumbers();
 
             } else if (clickedCell.value !== CLOSED) {
-                // Remove highlighting from previous cell and clue.
+                // Remove highlighting from previous cell and clue. Clear the definition and 
+                // word length inputs
+                document.getElementById('def-input').value = '';
+                document.getElementById('word-lengths-input').value = '';
                 if (grid.currentHighlightedClue) {
                     const cells = getClueCells(grid.currentHighlightedClue, grid);
                     for (let cell of cells) {
@@ -161,6 +180,10 @@ const drawGrid = (grid) => {
                 }
 
                 clueDiv.replaceChildren(...newSpans);
+
+                // Replace the contents of the definition and word lengths inputs
+                document.getElementById('def-input').value = grid.currentHighlightedClue.clue;
+                document.getElementById('word-lengths-input').value = grid.currentHighlightedClue.word_lengths;
             }
         });
         gridDiv.appendChild(cellDiv);

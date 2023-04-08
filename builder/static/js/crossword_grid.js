@@ -13,6 +13,23 @@ export class Clue {
         this.number = 0;
         this.len = 1;
     }
+
+    convertToObject() {
+        const list = [];
+        for (let cell of this.cellList) {
+            list.push(cell.value);
+        }
+        const solution_string = list.join('');
+        return {
+            'solution': solution_string,
+            'clue': this.clue,
+            'clue_number': this.number,
+            'orientation': this.orientation,
+            'start_row': this.startRow,
+            'start_col': this.startCol,
+            'word_lengths': this.word_lengths,
+        }
+    }
 }
 
 export class Cell {
@@ -46,6 +63,8 @@ export class Grid {
     }
 
     reindex = () => {
+
+        console.log('reindexing grid');
 
         // Clear the grid's clue list.
         this.clues = [];
@@ -192,6 +211,11 @@ export class Grid {
             }
         }
 
+        // Set the default word lengths attribute to the length of the clue
+        for (let clue of this.clues) {
+            clue.word_lengths = `(${clue.len})`;
+        }
+
         /* for (let clue of this.clues) {
             console.log(`Clue (${clue.startCol},${clue.startRow}) : number == ${clue.number}`);
         } */
@@ -217,7 +241,7 @@ export class Grid {
             const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
             cellValueSpan.innerText = character;
             const clueSpan = document.getElementById(`cluespan-${index}`);
-            clueSpan.innerText = keyIsLetter? character : '_';
+            clueSpan.innerText = keyIsLetter ? character : '_';
 
             // If not at end of clue, advance the currentHighlightedClue
             // to the next clue on the cellList.
