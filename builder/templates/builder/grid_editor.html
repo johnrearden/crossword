@@ -8,13 +8,29 @@
 {% block content %}
 <div class="container-fluid text-center mt-5">
     <h1>Grid</h1>
-    <div class="row justify-content-center">
-        <div class="col-8">
+    <div class="row">
+        <div class="col-auto justify-content-center">
             <div id="grid-editor-div"></div>
         </div>
-        <div class="col-4 border text-left">
-            <h3>Current Clue</h3>
-            <div id="current-clue-div"></div>
+        <div class="col border text-left">
+            <div class="row">
+                <div class="col-12 col-lg-4">
+                    <h3>Current Clue</h3>
+                    <div id="current-clue-div"></div>
+                </div>
+                <div class="col-12 col-lg-8">
+                    <h3>Definition</h3>
+                    <div id="current-definition-div">
+                        <input type="text" class="p-2" id="def-input"></input>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <button id="matches-button">Get Matches</button>
+            <div id="matches-div" class="border mt-2 p-2"></div>
+            <hr>
+            <div id="definition-div" class="border mt-2 p-2"></div>
         </div>
     </div>
     <div class="row border mt-5 justify-content-center">

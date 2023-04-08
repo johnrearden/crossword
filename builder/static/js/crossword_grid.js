@@ -122,23 +122,102 @@ export class Grid {
                 sharedClue.solution[sharedClue.len - 1] = this.cells[i].value;
             }
         }
+
+        // Calculate numbers for each clue, considering AC and DN separately.
+        // However, an AC and a DN clue can start in the same cell, and should
+        // then use the same number. Numbers cannot be duplicated in either the
+        // set of AC clues or the set of DN clues.
+
+        class Loc {
+            constructor(row, col) {
+                this.row = row;
+                this.col = col;
+            }
+        }
+
+        // Create a map, to hold the clues, keyed by a Loc object representing
+        // their starting cells.
+        const clueMap = new Map();
+
+        for (let clue of this.clues) {
+            const loc = new Loc(clue.startRow, clue.startCol);
+            if (clueMap.has(loc)) {
+                clueMap.get(loc).push(clue);
+            } else {
+                clueMap.set(loc, []);
+                clueMap.get(loc).push(clue);
+            }
+        }
+        const sortedClueMap = new Map([...clueMap].sort((a, b) => {
+            return a.col - b.col || a.row - b.row;
+        }));
+
+        // Keep a counter for the next indices of AC and DN clues respectively
+        let acrossCounter = 1;
+        let downCounter = 1;
+
+        // Keep track of the DN indices already used, so that they are not duplicated
+        const unusableDownIndices = [];
+
+        // Iterate through the sorted map.
+        for (let loc of sortedClueMap.keys()) {
+            const clueList = sortedClueMap.get(loc);
+            if (clueList.length > 1) {
+                // An AC and a DN clue share a starting cell - they get the same number
+                for (let clue of clueList) {
+                    if (clue.orientation === 'AC') {
+                        clue.number = acrossCounter;
+                    } else {
+                        clue.number = acrossCounter;
+                        unusableDownIndices.push(acrossCounter);
+                    }
+                }
+                acrossCounter++;
+            } else {
+                // This clue has a unique starting cell
+                const clue = clueList[0];
+                if (clue.orientation === 'AC') {
+                    // AC clues cannot have duplicate numbers
+                    clue.number = acrossCounter;
+                    acrossCounter++;
+                } else {
+                    // Ensure a DN clue does not reuse a number
+                    while (unusableDownIndices.includes(downCounter)) {
+                        downCounter++;
+                    }
+                    clue.number = downCounter;
+                    unusableDownIndices.push(downCounter);
+                    downCounter++;
+                }
+            }
+        }
+
+        /* for (let clue of this.clues) {
+            console.log(`Clue (${clue.startCol},${clue.startRow}) : number == ${clue.number}`);
+        } */
     }
 
     // Handle a keyup event on the document
     onKeyup = (event) => {
+
+        if (document.activeElement === document.getElementById('def-input')) {
+            return;
+        }
         const cell = this.currentHighlightedCell;
         const clue = this.currentHighlightedClue;
         const cellListIndex = clue.cellList.indexOf(cell);
 
         // Handle a letter key being released.
-        if (event.keyCode >= 65 && event.keyCode <= 90) {
+        const keyIsLetter = event.keyCode >= 65 && event.keyCode <= 90;
+        const keyIsSpace = event.keyCode === 32;
+        if (keyIsLetter || keyIsSpace) {
             const character = String.fromCharCode(event.keyCode);
-            cell.value = character;
+            cell.value = keyIsLetter ? character : OPEN;
             const index = cell.index;
-            const cellDiv = document.getElementById(`cellDiv-${index}`);
-            cellDiv.innerHTML = character;
+            const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
+            cellValueSpan.innerText = character;
             const clueSpan = document.getElementById(`cluespan-${index}`);
-            clueSpan.innerText = character;
+            clueSpan.innerText = keyIsLetter? character : '_';
 
             // If not at end of clue, advance the currentHighlightedClue
             // to the next clue on the cellList.
@@ -162,10 +241,11 @@ export class Grid {
             if (hasValue) {
                 // The cell should be cleared, and the index moved back.
                 const index = this.currentHighlightedCell.index;
-                const cellDiv = document.getElementById(`cellDiv-${index}`);
-                cellDiv.innerHTML = '';
+                const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
+                cellValueSpan.innerText = '';
                 const clueSpan = document.getElementById(`cluespan-${index}`);
                 clueSpan.innerText = '_';
+                this.currentHighlightedCell.value = OPEN;
                 if (cellListIndex > 0) {
                     let cellDiv = document.getElementById(`cellDiv-${cell.index}`);
                     let clueSpan = document.getElementById(`cluespan-${cell.index}`);
@@ -193,8 +273,8 @@ export class Grid {
                     clueSpan.classList.add('highlighted-cell');
                 }
                 const index = this.currentHighlightedCell.index;
-                const cellDiv = document.getElementById(`cellDiv-${index}`);
-                cellDiv.innerHTML = '';
+                const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
+                cellValueSpan.innerText = '';
                 const clueSpan = document.getElementById(`cluespan-${index}`);
                 clueSpan.innerText = '_';
                 this.currentHighlightedCell.value = OPEN;

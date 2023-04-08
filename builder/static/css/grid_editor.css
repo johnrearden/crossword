@@ -1,26 +1,40 @@
 :root {
     --grid-cols: 10;
     --grid-rows: 10;
+    --char-size: 2.5rem;
 }
 
 #grid-editor-div {
     display: grid;
-    grid-template-rows: repeat(var(--grid-rows), 3rem);
-    grid-template-columns: repeat(var(--grid-cols), 3rem);
+    grid-template-rows: repeat(var(--grid-rows), var(--char-size));
+    grid-template-columns: repeat(var(--grid-cols), var(--char-size));
 }
 
 .blank {
     background-color: black;
 }
 
-.open {
+.cell-div {
     font-family: sans-serif;
     border: 1px solid black;
     position: relative;
+    width: var(--char-size);
+    height: var(--char-size);
+}
+
+.cell-value-span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     text-transform: uppercase;
     text-align: center;
-    font-size: 2.3rem;
-    line-height: 3rem;
+    font-size: calc(var(--char-size) * 0.75);
+    line-height: var(--char-size);
+}
+
+.open {
+    color: black;
 }
 
 .open:hover {
@@ -35,10 +49,10 @@
 
 .numbered {
     position: absolute;
-    top: 1px;
-    left: 1px;
-    font-size: 0.6rem;
-    line-height: 0.6rem;
+    top: 2px;
+    left: 2px;
+    font-size: calc(var(--char-size) * 0.25);
+    line-height: 0.7rem;
 }
 
 .highlighted-cell {
@@ -50,13 +64,31 @@
 }
 
 .clue-character {
-    width: 3rem;
-    height: 3rem;
     font-family: sans-serif;
     position: relative;
     text-transform: uppercase;
     text-align: center;
-    font-size: 2.3rem;
-    line-height: 3rem;
+    font-size: calc(var(--char-size) * 0.75);
+    line-height: var(--char-size);
     padding: 2px;
+}
+
+#matches-div, #definition-div {
+    min-height: 30px;
+    max-height: 15vh;
+    overflow: auto;
+}
+
+.match-word {
+    display: inline-block;
+    padding: 2px 5px;
+    margin: 3px;
+    background-color: #bbbbbb;
+    border-radius: 5px;
+}
+
+.match-word:hover {
+    background-color: black;
+    color: white;
+    cursor: pointer;
 }
