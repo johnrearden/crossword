@@ -1,10 +1,11 @@
-import { Grid, Clue, Cell } from './crossword_grid.js';
+import { Grid } from './crossword_grid.js';
 import { OPEN, CLOSED } from './crossword_grid.js';
 import { getCellIndex } from './crossword_grid.js';
 
 let grid;
 
 document.addEventListener('DOMContentLoaded', () => {
+    fetch('/builder/get_recent_puzzles/').then((res => console.log(res)));
     const url = '/builder/get_grid/';
     fetch(url).then(response => response.json())
         .then(json => {

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid mt-5">
+    <div class="row justify-content-center">
+        <div class="col">
+            <a href="#">Create New Puzzle</a>
+        </div>
+        <div class="col">
+            <h3>Work on recently edited puzzle</h3>
+            <div id="thumbnail-holder"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block postloadjs %}
+{{ block.super }}
+<script src="{% static 'js/builder_home.js' %}" type="module"></script>
+{% endblock %}

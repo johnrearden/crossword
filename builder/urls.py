@@ -7,4 +7,9 @@ urlpatterns = [
     path('grid_editor/', views.GridEditor.as_view(), name='grid_editor'),
     path('get_grid/', views.GetGrid.as_view(), name='get_grid'),
     path('save_puzzle/', views.SavePuzzle.as_view(), name='save_puzzle'),
+    path('get_recent_puzzles/<int:puzzle_count>/',
+         views.GetRecentPuzzles.as_view(),
+         name='get_recent_puzzles'),
+    path('', views.BuilderHome.as_view(),
+         name='builder_home'),
 ]

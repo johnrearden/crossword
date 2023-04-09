@@ -6,7 +6,15 @@ from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin
 from .models import DictionaryWord, DictionaryDefinition, Grid
 from .models import CrosswordPuzzle, CrosswordClue
-from .serializers import GridSerializer
+from .serializers import GridSerializer, CrosswordPuzzleSerializer, CrosswordClueSerializer
+
+
+class BuilderHome(UserPassesTestMixin, View):
+    def get(self, request):
+        return render(request, 'builder/builder_home.html')
+
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class GetMatchingWord(APIView):
@@ -101,3 +109,22 @@ class SavePuzzle(APIView):
                 )
 
         return Response('You betcha')
+
+
+class GetRecentPuzzles(UserPassesTestMixin, APIView):
+    def get(self, request, puzzle_count):
+        puzzle = CrosswordPuzzle.objects \
+                                 .order_by('-created_on')[0]
+        clues = CrosswordClue.objects.filter(puzzle=puzzle)
+        puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
+        print(puzzle_serializer.data)
+        clue_serialzer = CrosswordClueSerializer(clues, many=True)
+        data = {
+            'puzzle': puzzle_serializer.data,
+            'clues': clue_serialzer.data,
+        }
+
+        return Response(data)
+
+    def test_func(self):
+        return self.request.user.is_staff

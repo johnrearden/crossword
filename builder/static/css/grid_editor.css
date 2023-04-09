@@ -4,6 +4,10 @@
     --char-size: 2.5rem;
 }
 
+body {
+    padding-top: 64px;
+}
+
 #grid-editor-div {
     display: grid;
     grid-template-rows: repeat(var(--grid-rows), var(--char-size));
@@ -97,4 +101,11 @@
 #save-button {
     font-size: 1.5rem;
     padding: 5px;
+}
+
+
+/* These elements style the builder_home page */
+
+.grid_thumbnail {
+    display: grid;
 }

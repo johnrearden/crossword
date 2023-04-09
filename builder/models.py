@@ -33,6 +33,7 @@ class CrosswordPuzzle(models.Model):
     grid = models.ForeignKey(Grid, on_delete=models.CASCADE,
                              related_name='puzzles')
     created_on = models.DateTimeField(auto_now_add=True)
+    last_edited = models.DateTimeField(auto_now=True)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
                                 related_name='grid_creator')
     complete = models.BooleanField(default=False)
