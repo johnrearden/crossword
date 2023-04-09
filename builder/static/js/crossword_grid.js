@@ -62,6 +62,19 @@ export class Grid {
         this.reindex();
     }
 
+    getGridObject = () => {
+        const cellValues = [];
+        for (let cell of this.cells) {
+            const value = cell.value === '-' ? '-' : '#';
+            cellValues.push(value);
+        }
+        return {
+            'grid_string': cellValues.join(''),
+            'width': this.width,
+            'height': this.height,
+        }
+    }
+
     reindex = () => {
 
         console.log('reindexing grid');

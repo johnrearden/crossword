@@ -3,7 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
 from django.views import View
+from django.contrib.auth.mixins import UserPassesTestMixin
 from .models import DictionaryWord, DictionaryDefinition, Grid
+from .models import CrosswordPuzzle, CrosswordClue
 from .serializers import GridSerializer
 
 
@@ -46,9 +48,12 @@ class GetDefinition(APIView):
         return JsonResponse({'results': def_list})
 
 
-class GridEditor(View):
+class GridEditor(UserPassesTestMixin, View):
     def get(self, request):
         return render(request, 'builder/grid_editor.html')
+
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class GetGrid(APIView):
@@ -57,3 +62,42 @@ class GetGrid(APIView):
         serializer = GridSerializer(instance=grid)
 
         return Response(serializer.data)
+
+
+class SavePuzzle(APIView):
+    def post(self, request, *args, **kwargs):
+        if request.data['puzzle_id']:
+            print('puzzle has id')
+        else:
+            grid_data = request.data['grid']
+            clues_data = request.data['clues']
+
+            # Create a grid
+            grid = Grid.objects.create(
+                creator=request.user,
+                width=grid_data['width'],
+                height=grid_data['height'],
+                cells=grid_data['grid_string'],
+            )
+
+            # Create a puzzle
+            puzzle = CrosswordPuzzle.objects.create(
+                grid=grid,
+                creator=request.user,
+            )
+
+            # Create the clues
+            for item in clues_data:
+                CrosswordClue.objects.create(
+                    puzzle=puzzle,
+                    creator=request.user,
+                    clue=item['clue'],
+                    clue_number=item['clue_number'],
+                    solution=item['solution'],
+                    word_lengths=item['word_lengths'],
+                    orientation=item['orientation'],
+                    start_row=item['start_row'],
+                    start_col=item['start_col'],
+                )
+
+        return Response('You betcha')

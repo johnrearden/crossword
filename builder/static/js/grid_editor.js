@@ -32,9 +32,24 @@ const drawGrid = (grid) => {
         for (let clue of grid.clues) {
             list.push(clue.convertToObject());
         }
-        console.log(JSON.stringify(
-            {'clues': list}
-        ));
+        const gridString = grid.getGridObject();
+        const payload = JSON.stringify({
+                'puzzle_id': null,
+                'clues': list,
+                'grid': gridString,
+            });
+        const url = '/builder/save_puzzle/';
+        const options = {
+            method: 'POST',
+            body: payload,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            }
+        }
+        console.log(getCookie('csrftoken'));
+        fetch(url, options).then(response => console.log(response)); 
     });
 
     document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {
@@ -300,6 +315,27 @@ const getDefinition = (word) => {
         });
 }
 
+
+/**
+ * Retrieves the document crsf cookie and returns it.
+ * @param {String} name 
+ * @returns the cookie value.
+ */
+const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+};
 
 
 

@@ -2,5 +2,13 @@
 {% load static %}
 
 {% block content %}
-<h1>Welcome to Fruzzled</h1>
+<div class="container-fluid">
+    <div class="row justify-contents-center mt-4">
+        <div class="col">
+            <h1>Welcome to Fruzzled</h1>
+            <a href="{% url 'grid_editor' %}">Grid Editor</a>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
