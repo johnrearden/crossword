@@ -3,6 +3,8 @@ import { OPEN, CLOSED } from './crossword_grid.js';
 import { getCellIndex } from './crossword_grid.js';
 
 let grid;
+let throttled = false;
+let keyboardDisplayed = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('/builder/get_recent_puzzles/').then((res => console.log(res)));
@@ -11,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(json => {
             grid = new Grid(json);
             drawGrid(grid);
+            populateVirtualKeyboard();
         });
 });
-
 
 const drawGrid = (grid) => {
     const width = grid.width;
@@ -24,8 +26,14 @@ const drawGrid = (grid) => {
     gridDiv.style.setProperty('--grid-rows', height);
     gridDiv.style.setProperty('--grid-cols', width);
 
+    setCrosswordCellWidth(grid);    
+
     document.addEventListener('keyup', (event) => {
-        grid.onKeyup(event);
+        if (document.activeElement === document.getElementById('def-input')) {
+            console.log('Not reacting to keypress - definition input is active');
+            return;
+        }
+        grid.onKeyup(event.keyCode);
     })
 
     document.getElementById('save-button').addEventListener('click', (event) => {
@@ -68,11 +76,16 @@ const drawGrid = (grid) => {
     });
 
     document.getElementById('def-input').addEventListener('input', (event) => {
-        grid.currentHighlightedClue.clue = event.target.value;
+        if (grid.currentHighlightedClue) {
+            grid.currentHighlightedClue.clue = event.target.value;
+        }
+        
     });
 
     document.getElementById('word-lengths-input').addEventListener('input', (e) => {
-        grid.currentHighlightedClue.word_lengths = e.target.value;
+        if (grid.currentHighlightedClue) {
+            grid.currentHighlightedClue.word_lengths = e.target.value;
+        }
     })
 
     document.getElementById('matches-button').addEventListener('click', (event) => {
@@ -127,7 +140,6 @@ const drawGrid = (grid) => {
         cellDiv.addEventListener('click', (event) => {
             const clickedCellIndex = event.target.id.split('-')[1];
             const clickedCell = cells[clickedCellIndex];
-            console.log(`clickedCell == ${clickedCell.index}`);
 
             if (isEditingLayout()) {
                 event.target.classList.toggle('open');
@@ -337,6 +349,64 @@ const getCookie = (name) => {
     }
     return cookieValue;
 };
+
+// Recalculate the cell size if the window is resized. Throttle to prevent
+// janky over-adjusting.
+window.addEventListener('resize', (event) => {
+    if (!throttled) {
+        setCrosswordCellWidth(grid);
+        throttled = true;
+        setTimeout(()=> {
+            throttled = false;
+        }, 100);
+    }
+    
+});
+
+const setCrosswordCellWidth = (grid) => {
+    // Calculate size of a cell based on window width and grid width in cells
+    const windowWidth = document.documentElement.clientWidth;
+    let cellWidth;
+    if (grid.width <= 9){
+        cellWidth = Math.floor(Math.min(windowWidth / 10, 40));
+    } else {
+        cellWidth = Math.floor(Math.min(windowWidth / (grid.width + 1), 40));
+    }
+    const gridDiv = document.getElementById('grid-editor-div');
+    gridDiv.style.setProperty('--char-size', `${cellWidth}px`);
+}
+
+const populateVirtualKeyboard = () => {
+    const keyboardDiv = document.getElementById('virtual-keyboard');
+    const topRow = document.getElementById('vk-top-row');
+    const middleRow = document.getElementById('vk-middle-row');
+    const bottomRow = document.getElementById('vk-bottom-row');
+
+    for (let char of ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P']) {
+        const span = document.createElement('span');
+        span.innerText = char;
+        span.classList.add('virtual-key', 'text-center');
+        const charCode = char === '\u21B5' ? 8 : char.charCodeAt(0);
+        span.addEventListener('click', () => grid.onKeyup(charCode));
+        topRow.appendChild(span);
+    }
+    for (let char of ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']) {
+        const span = document.createElement('span');
+        span.innerText = char;
+        span.classList.add('virtual-key', 'text-center');
+        const charCode = char === '\u21B5' ? 8 : char.charCodeAt(0);
+        span.addEventListener('click', () => grid.onKeyup(charCode));
+        middleRow.appendChild(span);
+    }
+    for (let char of ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '\u21B5']) {
+        const span = document.createElement('span');
+        span.innerText = char;
+        span.classList.add('virtual-key', 'text-center');
+        const charCode = char === '\u21B5' ? 8 : char.charCodeAt(0);
+        span.addEventListener('click', () => grid.onKeyup(charCode));
+        bottomRow.appendChild(span);
+    }
+}
 
 
 

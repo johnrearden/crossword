@@ -235,7 +235,7 @@ export class Grid {
     }
 
     // Handle a keyup event on the document
-    onKeyup = (event) => {
+    onKeyup = (keyCode) => {
 
         if (document.activeElement === document.getElementById('def-input')) {
             return;
@@ -245,10 +245,10 @@ export class Grid {
         const cellListIndex = clue.cellList.indexOf(cell);
 
         // Handle a letter key being released.
-        const keyIsLetter = event.keyCode >= 65 && event.keyCode <= 90;
-        const keyIsSpace = event.keyCode === 32;
+        const keyIsLetter = keyCode >= 65 && keyCode <= 90;
+        const keyIsSpace = keyCode === 32;
         if (keyIsLetter || keyIsSpace) {
-            const character = String.fromCharCode(event.keyCode);
+            const character = String.fromCharCode(keyCode);
             cell.value = keyIsLetter ? character : OPEN;
             const index = cell.index;
             const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
@@ -273,7 +273,7 @@ export class Grid {
         }
 
         // Handle BACKSPACE being pressed
-        if (event.keyCode === 8) {
+        if (keyCode === 8) {
             const hasValue = cell.value != '' && cell.value != OPEN;
             if (hasValue) {
                 // The cell should be cleared, and the index moved back.
