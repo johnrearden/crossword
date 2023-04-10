@@ -68,7 +68,7 @@ body {
 
 .highlighted-cell {
     box-sizing: border-box;
-    border : 3px solid red;
+    border : 2px solid blue;
 }
 
 .highlighted-clue {
@@ -91,7 +91,7 @@ body {
     overflow: auto;
 }
 
-#def-input {
+.def-input {
     font-size: 18px;
 }
 
