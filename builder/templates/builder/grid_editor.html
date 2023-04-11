@@ -7,35 +7,29 @@
 
 {% block content %}
 <div class="container-fluid text-center mt-3">
+
+    <!-- The main crossword grid editor -->
     <div class="row">
-        <div class="col">
+        <div class="col-12 col-md-6">
             <div id="grid-editor-div"></div>
+            <hr>
         </div>
-        <div class="col border text-center">
-            <div class="row">
-                <div class="col">
-                    <h3>Answer</h3>
+
+        <!-- The current answer display, with buttons for get matches and enter clue -->
+        <div class="col-12 col-md-6 text-center">
+            <div class="row mt-2 align-items-center">
+                <div class="col-2">
+                    <button>?</button>
+                </div>
+                <div class="col-8">
                     <div id="current-clue-div"></div>
                 </div>
-                <div class="col">
-                    <h3>Clue</h3>
-                    <div id="current-definition-div">
-                        <input type="text" class="p-2 def-input" id="def-input">
-                    </div>
-                </div>
-                <div class="col">
-                    <h3>Word Lngt</h3>
-                    <div>
-                        <input type="text" class="p-2" id="word-lengths-input">
-                    </div>
+                <div class="col-2">
+                    <button id="matches-button" data-bs-toggle="modal" data-bs-target="#matches-modal">
+                        M
+                    </button>
                 </div>
             </div>
-
-            <hr>
-            <button id="matches-button">Get Matches</button>
-            <div id="matches-div" class="border mt-2 p-2"></div>
-            <hr>
-            <div id="definition-div" class="border mt-2 p-2"></div>
         </div>
     </div>
     <div class="row border mt-5 justify-content-center">
@@ -49,11 +43,47 @@
     </div>
 </div>
 
-<div id="virtual-keyboard" class="container-fluid d-md-none">
+<!-- Virtual keyboard, appears only when a cell-group is selected, dismissed when modals opened-->
+<div id="virtual-keyboard" class="container-fluid d-md-none py-1">
     <div class="row justify-content-center" id="vk-top-row"></div>
     <div class="row justify-content-center" id="vk-middle-row"></div>
     <div class="row justify-content-center" id="vk-bottom-row"></div>
 </div>
+
+<!-- Matches modal : Displays all words in dictionary of equal length matching existing characters -->
+<div class="modal" id="matches-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="matches-modal-title">Matches</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="matches-div"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Clue Editor modal : Displays all definitions available and an input for the clue -->
+<div class="modal" id="clue-editor-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Clue</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="definition-div"></div>
+            <div class="modal-footer">
+                <input type="text" class="p-2 def-input" id="def-input">
+                <input type="text" class="p-2" id="word-lengths-input">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block postloadjs %}

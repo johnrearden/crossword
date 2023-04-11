@@ -57,7 +57,6 @@ const drawGrid = (grid) => {
                 'X-CSRFToken': getCookie('csrftoken'),
             }
         }
-        console.log(getCookie('csrftoken'));
         fetch(url, options).then(response => console.log(response)); 
     });
 
@@ -90,9 +89,7 @@ const drawGrid = (grid) => {
 
     document.getElementById('matches-button').addEventListener('click', (event) => {
 
-        // Clear the definition div first.
-        const definitionDiv = document.getElementById('definition-div');
-        definitionDiv.innerText = '';
+        // Show the modal
 
         const clueDiv = document.getElementById('current-clue-div');
         const query = [];
@@ -106,13 +103,18 @@ const drawGrid = (grid) => {
         fetch(url).then(response => response.json())
             .then(json => {
                 const results = json.results;
+                const count = results.length;
+                document.getElementById('matches-modal-title').innerText = `Matches (${count})`;
                 for (let item of results) {
                     const span = document.createElement('span');
                     span.classList.add('match-word');
                     span.innerText = item;
                     span.addEventListener('click', (event) => {
                         replaceCurrentClue(item);
-                        getDefinition(item);
+                        const modalDiv = document.getElementById('matches-modal');
+                        const modal = bootstrap.Modal.getInstance(modalDiv);
+                        modal.hide();
+                        // getDefinition(item);
                     });
                     matchesDiv.appendChild(span);
                 }

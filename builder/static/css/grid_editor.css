@@ -27,6 +27,7 @@ body {
 
 .cell-div {
     font-family: sans-serif;
+    font-weight: bold;
     border: 1px solid black;
     position: relative;
     width: var(--char-size);
@@ -68,11 +69,15 @@ body {
 
 .highlighted-cell {
     box-sizing: border-box;
-    border : 2px solid blue;
+    border : 1px solid blue;
 }
 
 .highlighted-clue {
     background-color: #ffa50050;
+}
+
+#current-clue-div {
+    height: var(--char-size);
 }
 
 .clue-character {
@@ -80,14 +85,12 @@ body {
     position: relative;
     text-transform: uppercase;
     text-align: center;
-    font-size: calc(var(--char-size) * 0.75);
+    font-size: calc(var(--char-size) * 0.5);
     line-height: var(--char-size);
     padding: 2px;
 }
 
 #matches-div, #definition-div {
-    min-height: 30px;
-    max-height: 15vh;
     overflow: auto;
 }
 
@@ -97,6 +100,7 @@ body {
 
 .match-word {
     display: inline-block;
+    cursor: pointer;
     padding: 2px 5px;
     margin: 3px;
     background-color: #bbbbbb;
@@ -116,21 +120,22 @@ body {
 
 #virtual-keyboard {
     background-color: grey;
-    position: absolute;
+    position: fixed;
     bottom: 0;
 }
 
 .virtual-key {
+    text-align: center;
     padding-top: 3px;
-    width: 25px;
-    height: 25px;
-    font-size: 19px;
-    line-height: 19px;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    line-height: 21px;
     border-radius: 4px;
     background-color: lightgrey;
     border: 1px solid darkgrey;
     text-transform: uppercase;
-    margin: 5px 2px;
+    margin: 2px 2px;
 }
 
 

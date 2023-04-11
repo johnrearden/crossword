@@ -30,6 +30,10 @@ a, a:hover {
     height: 70px;
 }
 
+.text-white {
+    color: white;
+}
+
 /* These elements style the puzzle_interface.html template */ 
 
 .puzzle-grid {
