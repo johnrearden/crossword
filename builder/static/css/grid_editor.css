@@ -6,12 +6,16 @@
 
 @media screen and (max-width: 567px) {
     :root {
-        font-size: 12px;
+        font-size: 14px;
     }
 }
 
 body {
     padding-top: 64px;
+}
+
+.bg-grey {
+    background-color: #cccccc;
 }
 
 #grid-editor-div {
@@ -95,6 +99,7 @@ body {
 }
 
 .def-input {
+    width: 100%;
     font-size: 18px;
 }
 
@@ -114,14 +119,16 @@ body {
 }
 
 #save-button {
-    font-size: 1.5rem;
-    padding: 5px;
 }
 
 #virtual-keyboard {
     background-color: grey;
     position: fixed;
     bottom: 0;
+}
+
+#clue-display {
+    font-size: 16px;
 }
 
 .virtual-key {

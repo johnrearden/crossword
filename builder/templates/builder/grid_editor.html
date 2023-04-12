@@ -6,20 +6,32 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid text-center mt-3">
+<div class="container-fluid text-center">
+
+    <div class="row mt-1 justify-content-center">
+        <div class="col">
+            <label for="layout-editor-checkbox">Edit Layout</label>
+            <input type="checkbox" id="layout-editor-checkbox">
+        </div>
+        <div class="col">
+            <button id="save-button">Save</button>
+        </div>
+    </div>
 
     <!-- The main crossword grid editor -->
-    <div class="row">
+    <div class="row mt-2">
         <div class="col-12 col-md-6">
             <div id="grid-editor-div"></div>
             <hr>
         </div>
 
         <!-- The current answer display, with buttons for get matches and enter clue -->
-        <div class="col-12 col-md-6 text-center">
+        <div id="current-item-holder" class="col-12 col-md-6 text-center">
             <div class="row mt-2 align-items-center">
                 <div class="col-2">
-                    <button>?</button>
+                    <button id="clue-editor-button" data-bs-toggle="modal" data-bs-target="#clue-editor-modal">
+                        ?
+                    </button>
                 </div>
                 <div class="col-8">
                     <div id="current-clue-div"></div>
@@ -30,15 +42,11 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row border mt-5 justify-content-center">
-        <div class="col">
-            <label for="layout-editor-checkbox">Edit Layout</label>
-            <input type="checkbox" id="layout-editor-checkbox">
-        </div>
-        <div class="col">
-            <button id="save-button">Save</button>
+            <div class="row justify-content-start">
+                <div class="col border mt-1 w-100 text-left bg-grey">
+                    <p id="clue-display" class="my-auto"></p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -74,10 +82,15 @@
                 <h5 class="modal-title">Clue</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="definition-div"></div>
+            <div class="modal-body">
+                <form id="clue-form" action="#">
+                    <input type="text" class="p-2 def-input mt-2" id="def-input">
+                    <input type="text" class="p-2 mt-2" id="word-lengths-input">
+                </form>
+                <div id="definition-div"></div>
+            </div>
             <div class="modal-footer">
-                <input type="text" class="p-2 def-input" id="def-input">
-                <input type="text" class="p-2" id="word-lengths-input">
+                
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>

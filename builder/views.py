@@ -47,7 +47,7 @@ class GetMatchingWord(APIView):
 
 class GetDefinition(APIView):
     def get(self, request, query):
-        words = DictionaryWord.objects.filter(string=query)
+        words = DictionaryWord.objects.filter(string=query.lower())
         def_list = []
         for word in words:
             definitions = DictionaryDefinition.objects.filter(word=word)

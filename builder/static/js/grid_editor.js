@@ -26,11 +26,17 @@ const drawGrid = (grid) => {
     gridDiv.style.setProperty('--grid-rows', height);
     gridDiv.style.setProperty('--grid-cols', width);
 
-    setCrosswordCellWidth(grid);    
+    setCrosswordCellWidth(grid);
 
     document.addEventListener('keyup', (event) => {
+        console.log(`keyEvent : key == ${event.key}`);
         if (document.activeElement === document.getElementById('def-input')) {
-            console.log('Not reacting to keypress - definition input is active');
+            if (event.key === 'Enter') {
+                console.log('submit called on clue-form');
+                const modalDiv = document.getElementById('clue-editor-modal');
+                const modal = bootstrap.Modal.getInstance(modalDiv);
+                modal.hide();
+            }
             return;
         }
         grid.onKeyup(event.keyCode);
@@ -43,10 +49,10 @@ const drawGrid = (grid) => {
         }
         const gridString = grid.getGridObject();
         const payload = JSON.stringify({
-                'puzzle_id': null,
-                'clues': list,
-                'grid': gridString,
-            });
+            'puzzle_id': null,
+            'clues': list,
+            'grid': gridString,
+        });
         const url = '/builder/save_puzzle/';
         const options = {
             method: 'POST',
@@ -57,7 +63,7 @@ const drawGrid = (grid) => {
                 'X-CSRFToken': getCookie('csrftoken'),
             }
         }
-        fetch(url, options).then(response => console.log(response)); 
+        fetch(url, options).then(response => console.log(response));
     });
 
     document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {
@@ -65,38 +71,42 @@ const drawGrid = (grid) => {
         grid.currentHighlightedCell = null;
         grid.currentHighlightedClue = null;
 
+        const currentItemHolder = document.getElementById("current-item-holder");
+
         if (!event.target.checked) {
-            console.log('clearing numbers');
             clearExistingClueNumbers();
             grid.reindex();
-            console.log('rendering new numbers');
             rerenderClueNumbers();
+            currentItemHolder.classList.remove('d-none');
+        } else {
+            currentItemHolder.classList.add('d-none');
         }
+    });
+
+    const clueEditorButton = document.getElementById('clue-editor-button');
+    clueEditorButton.addEventListener('click', (event) => {
+        const word = getWordFromClueDiv();
+        getDefinition(word);
     });
 
     document.getElementById('def-input').addEventListener('input', (event) => {
         if (grid.currentHighlightedClue) {
             grid.currentHighlightedClue.clue = event.target.value;
+            displayClue(grid.currentHighlightedClue.clue);
         }
-        
+
     });
 
     document.getElementById('word-lengths-input').addEventListener('input', (e) => {
         if (grid.currentHighlightedClue) {
             grid.currentHighlightedClue.word_lengths = e.target.value;
         }
-    })
+    });
 
     document.getElementById('matches-button').addEventListener('click', (event) => {
 
-        // Show the modal
-
-        const clueDiv = document.getElementById('current-clue-div');
-        const query = [];
-        for (let child of clueDiv.children) {
-            query.push(child.innerText);
-        }
-        const queryString = query.join('');
+        // Show the word matches modal
+        const queryString = getWordFromClueDiv();
         const url = `/builder/query/${queryString}`;
         const matchesDiv = document.getElementById('matches-div');
         matchesDiv.textContent = '';
@@ -114,7 +124,6 @@ const drawGrid = (grid) => {
                         const modalDiv = document.getElementById('matches-modal');
                         const modal = bootstrap.Modal.getInstance(modalDiv);
                         modal.hide();
-                        // getDefinition(item);
                     });
                     matchesDiv.appendChild(span);
                 }
@@ -211,9 +220,10 @@ const drawGrid = (grid) => {
 
                 clueDiv.replaceChildren(...newSpans);
 
-                // Replace the contents of the definition and word lengths inputs
+                // Replace the contents of the definition and word lengths inputs, and display the current clue
                 document.getElementById('def-input').value = grid.currentHighlightedClue.clue;
                 document.getElementById('word-lengths-input').value = grid.currentHighlightedClue.word_lengths;
+                displayClue(grid.currentHighlightedClue.clue);
             }
         });
         gridDiv.appendChild(cellDiv);
@@ -322,12 +332,38 @@ const getDefinition = (word) => {
             const results = json.results;
             const definitionDiv = document.getElementById('definition-div');
             definitionDiv.innerText = '';
-            for (let item of results) {
+            if (results.length === 0) {
                 const p = document.createElement('p');
-                p.innerText = item;
+                p.innerText = `Sorry, no definitions found for ${word}`;
                 definitionDiv.appendChild(p);
+            } else {
+                for (let item of results) {
+                    const p = document.createElement('p');
+                    p.innerText = item;
+                    definitionDiv.appendChild(p);
+                }
             }
         });
+}
+
+const displayClue = (clue) => {
+    const clueDisplay = document.getElementById('clue-display');
+    clueDisplay.innerText = clue;
+}
+
+/**
+ * Builds a string from the contents of the current clue div.
+ * 
+ * @returns A string representation of the letters currently in the current-clue-div
+ */
+const getWordFromClueDiv = () => {
+    const clueDiv = document.getElementById('current-clue-div');
+    const query = [];
+    for (let child of clueDiv.children) {
+        query.push(child.innerText);
+    }
+    const result = query.join('');
+    return result || '';
 }
 
 
@@ -358,18 +394,18 @@ window.addEventListener('resize', (event) => {
     if (!throttled) {
         setCrosswordCellWidth(grid);
         throttled = true;
-        setTimeout(()=> {
+        setTimeout(() => {
             throttled = false;
         }, 100);
     }
-    
+
 });
 
 const setCrosswordCellWidth = (grid) => {
     // Calculate size of a cell based on window width and grid width in cells
     const windowWidth = document.documentElement.clientWidth;
     let cellWidth;
-    if (grid.width <= 9){
+    if (grid.width <= 9) {
         cellWidth = Math.floor(Math.min(windowWidth / 10, 40));
     } else {
         cellWidth = Math.floor(Math.min(windowWidth / (grid.width + 1), 40));
