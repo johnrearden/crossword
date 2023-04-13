@@ -48,7 +48,7 @@ class GetMatchingWord(APIView):
 
 class GetDefinition(APIView):
     def get(self, request, query):
-        words = DictionaryWord.objects.filter(string=query.lower)
+        words = DictionaryWord.objects.filter(string=query.lower())
         def_list = []
         for word in words:
             definitions = DictionaryDefinition.objects.filter(word=word)
@@ -115,7 +115,7 @@ class SavePuzzle(APIView):
 class GetRecentPuzzles(UserPassesTestMixin, APIView):
     def get(self, request, puzzle_count):
         puzzle = CrosswordPuzzle.objects \
-                                 .order_by('-created_on')[0]
+                                 .order_by('created_on')[0]
         clues = CrosswordClue.objects.filter(puzzle=puzzle)
         puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
         print(puzzle_serializer.data)

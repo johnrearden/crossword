@@ -7,7 +7,8 @@ let throttled = false;
 let keyboardDisplayed = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/builder/get_recent_puzzles/').then((res => console.log(res)));
+    fetch('/builder/get_recent_puzzles/1/').then(res => res.json()
+                                           .then(json => console.log(json)));
     const url = '/builder/get_grid/';
     fetch(url).then(response => response.json())
         .then(json => {
@@ -369,6 +370,7 @@ const replaceCurrentClue = (str) => {
 // Fetch the definition for the clicked word and display it.
 const getDefinition = (word) => {
     const url = `/builder/get_definition/${word}/`;
+    console.log(url);
     fetch(url).then(res => res.json())
         .then(json => {
             const results = json.results;
