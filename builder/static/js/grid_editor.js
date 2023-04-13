@@ -63,7 +63,11 @@ const drawGrid = (grid) => {
                 'X-CSRFToken': getCookie('csrftoken'),
             }
         }
-        fetch(url, options).then(response => console.log(response));
+        fetch(url, options).then(response => {
+            if (response.ok) {
+                alert('Crossword saved successfully');
+            }
+        });
     });
 
     document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {
@@ -100,6 +104,43 @@ const drawGrid = (grid) => {
     document.getElementById('word-lengths-input').addEventListener('input', (e) => {
         if (grid.currentHighlightedClue) {
             grid.currentHighlightedClue.word_lengths = e.target.value;
+        }
+    });
+
+    document.getElementById('clear-clue-button').addEventListener('click', (e) => {
+        if (!grid.currentHighlightedClue) {
+            return;
+        }
+
+        // Remove all characters from the current selected clue, except those in
+        // use by intersecting clues.
+        for (let cell of grid.currentHighlightedClue.cellList) {
+
+            // Check if cell is in use by an intersecting (and complete) solution. If so, 
+            // don't erase it.
+            if (cell.clueAcross && cell.clueDown) {
+                const intersector = cell.orientation === "AC" ? cell.clueDown : cell.clueAcross;
+                let allCellsFilled = true;
+                for (let c of intersector.cellList) {
+                    if (c.value === OPEN) {
+                        allCellsFilled = false;
+                    }
+                }
+                if (allCellsFilled) {
+                    continue;
+                }
+            }
+
+            // Remove each cell's value
+            cell.value = OPEN;
+
+            // Clear the current clue div cell
+            const clueSpan = document.getElementById(`cluespan-${cell.index}`);
+            clueSpan.innerText = '_';
+
+            // Clear the main crossword cell span
+            const cellValueSpan = document.getElementById(`cellvaluespan-${cell.index}`);
+            cellValueSpan.innerText = '';
         }
     });
 

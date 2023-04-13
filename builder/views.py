@@ -6,7 +6,8 @@ from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin
 from .models import DictionaryWord, DictionaryDefinition, Grid
 from .models import CrosswordPuzzle, CrosswordClue
-from .serializers import GridSerializer, CrosswordPuzzleSerializer, CrosswordClueSerializer
+from .serializers import GridSerializer, CrosswordPuzzleSerializer, \
+                         CrosswordClueSerializer
 
 
 class BuilderHome(UserPassesTestMixin, View):
@@ -47,7 +48,7 @@ class GetMatchingWord(APIView):
 
 class GetDefinition(APIView):
     def get(self, request, query):
-        words = DictionaryWord.objects.filter(string=query.lower())
+        words = DictionaryWord.objects.filter(string=query.lower)
         def_list = []
         for word in words:
             definitions = DictionaryDefinition.objects.filter(word=word)

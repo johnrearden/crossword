@@ -4,12 +4,6 @@
     --char-size: 40px;
 }
 
-@media screen and (max-width: 567px) {
-    :root {
-        font-size: 14px;
-    }
-}
-
 body {
     padding-top: 64px;
 }
@@ -23,6 +17,11 @@ body {
     display: grid;
     grid-template-rows: repeat(var(--grid-rows), var(--char-size));
     grid-template-columns: repeat(var(--grid-cols), var(--char-size));
+}
+
+.puzzle-grid-thumbnail {
+    display: grid;
+    justify-content: center;
 }
 
 .blank {
@@ -108,7 +107,8 @@ body {
     cursor: pointer;
     padding: 2px 5px;
     margin: 3px;
-    background-color: #bbbbbb;
+    background-color: #eeeeee;
+    border: 1px solid lightgrey;
     border-radius: 5px;
 }
 
@@ -118,7 +118,9 @@ body {
     cursor: pointer;
 }
 
-#save-button {
+.letter-button {
+    font-size: 1.2rem;
+    padding: 2px 5px;
 }
 
 #virtual-keyboard {
@@ -150,4 +152,16 @@ body {
 
 .grid_thumbnail {
     display: grid;
+}
+
+.animation-div {
+    height: 40vh;
+    width: 100vw;
+    background-color: grey;
+    position: relative;
+}
+
+.animation-span {
+    position: absolute;
+    font-size: 4rem;
 }
