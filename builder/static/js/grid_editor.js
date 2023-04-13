@@ -29,7 +29,6 @@ const drawGrid = (grid) => {
     setCrosswordCellWidth(grid);
 
     document.addEventListener('keyup', (event) => {
-        console.log(`keyEvent : key == ${event.key}`);
         if (document.activeElement === document.getElementById('def-input')) {
             if (event.key === 'Enter') {
                 console.log('submit called on clue-form');
@@ -108,18 +107,20 @@ const drawGrid = (grid) => {
     });
 
     document.getElementById('clear-clue-button').addEventListener('click', (e) => {
-        if (!grid.currentHighlightedClue) {
+
+        const thisClue = grid.currentHighlightedClue;
+        if (!thisClue) {
             return;
         }
 
         // Remove all characters from the current selected clue, except those in
         // use by intersecting clues.
-        for (let cell of grid.currentHighlightedClue.cellList) {
+        for (let cell of thisClue.cellList) {
 
             // Check if cell is in use by an intersecting (and complete) solution. If so, 
             // don't erase it.
             if (cell.clueAcross && cell.clueDown) {
-                const intersector = cell.orientation === "AC" ? cell.clueDown : cell.clueAcross;
+                const intersector = thisClue.orientation === "AC" ? cell.clueDown : cell.clueAcross;
                 let allCellsFilled = true;
                 for (let c of intersector.cellList) {
                     if (c.value === OPEN) {
