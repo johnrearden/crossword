@@ -1,20 +1,5 @@
 import { OPEN, CLOSED } from './crossword_grid.js';
 
-const animation = {
-    x: 10,
-    y: 10,
-    z: 50,
-    xRot: 0,
-    yRot: 0,
-    zRot: 0,
-    xVel: 0.01,
-    yVel: 0.01,
-    zVel: 5,
-    xAngVel: 6,
-    yAngVel: 45,
-    zAngVel: 0,
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const url = '/builder/get_recent_puzzles/1/';
     fetch(url).then(response => response.json())
@@ -36,9 +21,17 @@ const renderThumbnails = (json) => {
     lastEditedTitle.innerText = `Last edited on ${lastEditDateString}`;
     thumbnailHolder.appendChild(title);
     thumbnailHolder.appendChild(lastEditedTitle);
-    thumbnailHolder.appendChild(createThumbnail(json));
+    const container = createThumbnail(json);
+    container.addEventListener('click', (e) => {
+        redirectToPuzzleEditor()
+    });
+    thumbnailHolder.appendChild(container);
 
     console.log(json.puzzle);
+}
+
+const redirectToPuzzleEditor = () => {
+    console.log('redirecting to puzzle editor');
 }
 
 const createThumbnail = (json) => {

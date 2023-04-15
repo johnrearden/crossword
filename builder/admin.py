@@ -8,7 +8,7 @@ class GridAdmin(admin.ModelAdmin):
 
 
 class CrosswordPuzzleAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'grid', 'created_on', 'creator')
+    list_display = ('pk', 'grid', 'created_on', 'creator', 'last_edited')
 
 
 class CrosswordClueAdmin(admin.ModelAdmin):

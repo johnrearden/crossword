@@ -21,4 +21,4 @@ class CrosswordPuzzleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CrosswordPuzzle
-        fields = ['created_on', 'creator', 'last_edited', 'grid', ]
+        fields = ['id', 'created_on', 'creator', 'last_edited', 'grid', ]

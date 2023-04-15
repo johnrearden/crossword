@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import JsonResponse
@@ -65,6 +65,22 @@ class GridEditor(UserPassesTestMixin, View):
         return self.request.user.is_staff
 
 
+class PuzzleEditor(UserPassesTestMixin, View):
+    def get(self, request, puzzle_id):
+        puzzle = get_object_or_404(CrosswordPuzzle, pk=puzzle_id)
+        clues = CrosswordClue.objects.filter(puzzle=puzzle)
+        puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
+        clue_serialzer = CrosswordClueSerializer(clues, many=True)
+        data = {
+            'puzzle': puzzle_serializer.data,
+            'clues': clue_serialzer.data,
+        }
+        return render(request, 'builder/grid_editor.html', {'data': data})
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
 class GetGrid(APIView):
     def get(self, request):
         grid = Grid.objects.all()[0]
@@ -115,7 +131,7 @@ class SavePuzzle(APIView):
 class GetRecentPuzzles(UserPassesTestMixin, APIView):
     def get(self, request, puzzle_count):
         puzzle = CrosswordPuzzle.objects \
-                                 .order_by('created_on')[0]
+                                 .order_by('last_edited')[0]
         clues = CrosswordClue.objects.filter(puzzle=puzzle)
         puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
         print(puzzle_serializer.data)

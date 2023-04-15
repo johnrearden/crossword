@@ -102,5 +102,8 @@
 
 {% block postloadjs %}
 {{ block.super }}
+
 <script type="module" src="{% static 'js/grid_editor.js' %}"></script>
+{{ data | json_script:"data" }}
+
 {% endblock %}

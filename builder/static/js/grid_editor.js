@@ -7,16 +7,27 @@ let throttled = false;
 let keyboardDisplayed = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/builder/get_recent_puzzles/1/').then(res => res.json()
-                                           .then(json => console.log(json)));
-    const url = '/builder/get_grid/';
-    fetch(url).then(response => response.json())
-        .then(json => {
-            grid = new Grid(json);
-            drawGrid(grid);
-            populateVirtualKeyboard();
-        });
+    const data = JSON.parse(document.getElementById('data').textContent);
+    grid = new Grid(data.puzzle.grid);
+    drawGrid(grid);
+    renderSolutions(data.clues);
+    populateVirtualKeyboard();
 });
+
+const renderSolutions = (clues) => {
+    for (let clue of clues) {
+        for (let i = 0; i < clue.solution.length; i++) {
+            const xCoor = clue.orientation === 'AC' ? clue.start_col + i : clue.start_col;
+            const yCoor = clue.orientation === 'AC' ? clue.start_row : clue.start_row + i;
+            const index = xCoor + yCoor * grid.width;
+            console.log(`x: ${xCoor}, y: ${yCoor}, index : ${index}`);
+            const span = document.getElementById(`cellvaluespan-${index}`);
+            const character = clue.solution[i];
+            span.innerText = character;
+            grid.cells[index].value = character === OPEN ? OPEN : character;
+        }
+    }
+}
 
 const drawGrid = (grid) => {
     const width = grid.width;
@@ -28,150 +39,7 @@ const drawGrid = (grid) => {
     gridDiv.style.setProperty('--grid-cols', width);
 
     setCrosswordCellWidth(grid);
-
-    document.addEventListener('keyup', (event) => {
-        if (document.activeElement === document.getElementById('def-input')) {
-            if (event.key === 'Enter') {
-                console.log('submit called on clue-form');
-                const modalDiv = document.getElementById('clue-editor-modal');
-                const modal = bootstrap.Modal.getInstance(modalDiv);
-                modal.hide();
-            }
-            return;
-        }
-        grid.onKeyup(event.keyCode);
-    })
-
-    document.getElementById('save-button').addEventListener('click', (event) => {
-        const list = [];
-        for (let clue of grid.clues) {
-            list.push(clue.convertToObject());
-        }
-        const gridString = grid.getGridObject();
-        const payload = JSON.stringify({
-            'puzzle_id': null,
-            'clues': list,
-            'grid': gridString,
-        });
-        const url = '/builder/save_puzzle/';
-        const options = {
-            method: 'POST',
-            body: payload,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            }
-        }
-        fetch(url, options).then(response => {
-            if (response.ok) {
-                alert('Crossword saved successfully');
-            }
-        });
-    });
-
-    document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {
-        unSelectCurrentClue(event);
-        grid.currentHighlightedCell = null;
-        grid.currentHighlightedClue = null;
-
-        const currentItemHolder = document.getElementById("current-item-holder");
-
-        if (!event.target.checked) {
-            clearExistingClueNumbers();
-            grid.reindex();
-            rerenderClueNumbers();
-            currentItemHolder.classList.remove('d-none');
-        } else {
-            currentItemHolder.classList.add('d-none');
-        }
-    });
-
-    const clueEditorButton = document.getElementById('clue-editor-button');
-    clueEditorButton.addEventListener('click', (event) => {
-        const word = getWordFromClueDiv();
-        getDefinition(word);
-    });
-
-    document.getElementById('def-input').addEventListener('input', (event) => {
-        if (grid.currentHighlightedClue) {
-            grid.currentHighlightedClue.clue = event.target.value;
-            displayClue(grid.currentHighlightedClue.clue);
-        }
-
-    });
-
-    document.getElementById('word-lengths-input').addEventListener('input', (e) => {
-        if (grid.currentHighlightedClue) {
-            grid.currentHighlightedClue.word_lengths = e.target.value;
-        }
-    });
-
-    document.getElementById('clear-clue-button').addEventListener('click', (e) => {
-
-        const thisClue = grid.currentHighlightedClue;
-        if (!thisClue) {
-            return;
-        }
-
-        // Remove all characters from the current selected clue, except those in
-        // use by intersecting clues.
-        for (let cell of thisClue.cellList) {
-
-            // Check if cell is in use by an intersecting (and complete) solution. If so, 
-            // don't erase it.
-            if (cell.clueAcross && cell.clueDown) {
-                const intersector = thisClue.orientation === "AC" ? cell.clueDown : cell.clueAcross;
-                let allCellsFilled = true;
-                for (let c of intersector.cellList) {
-                    if (c.value === OPEN) {
-                        allCellsFilled = false;
-                    }
-                }
-                if (allCellsFilled) {
-                    continue;
-                }
-            }
-
-            // Remove each cell's value
-            cell.value = OPEN;
-
-            // Clear the current clue div cell
-            const clueSpan = document.getElementById(`cluespan-${cell.index}`);
-            clueSpan.innerText = '_';
-
-            // Clear the main crossword cell span
-            const cellValueSpan = document.getElementById(`cellvaluespan-${cell.index}`);
-            cellValueSpan.innerText = '';
-        }
-    });
-
-    document.getElementById('matches-button').addEventListener('click', (event) => {
-
-        // Show the word matches modal
-        const queryString = getWordFromClueDiv();
-        const url = `/builder/query/${queryString}`;
-        const matchesDiv = document.getElementById('matches-div');
-        matchesDiv.textContent = '';
-        fetch(url).then(response => response.json())
-            .then(json => {
-                const results = json.results;
-                const count = results.length;
-                document.getElementById('matches-modal-title').innerText = `Matches (${count})`;
-                for (let item of results) {
-                    const span = document.createElement('span');
-                    span.classList.add('match-word');
-                    span.innerText = item;
-                    span.addEventListener('click', (event) => {
-                        replaceCurrentClue(item);
-                        const modalDiv = document.getElementById('matches-modal');
-                        const modal = bootstrap.Modal.getInstance(modalDiv);
-                        modal.hide();
-                    });
-                    matchesDiv.appendChild(span);
-                }
-            });
-    });
+    addEventListeners();
 
     // Iterate through the grid
     for (let i = 0; i < cells.length; i++) {
@@ -200,8 +68,6 @@ const drawGrid = (grid) => {
                 event.target.classList.toggle('blank');
                 const cellIndex = event.target.id.split('-')[1];
                 cells[cellIndex].value = cells[cellIndex].value === CLOSED ? OPEN : CLOSED;
-
-                console.log(`cell at ${cellIndex} is now ${cells[cellIndex].value}`);
 
                 // Reindex the grid, clearing the clue numbers beforehand, and rendering the new ones
                 // afterwards
@@ -488,6 +354,152 @@ const populateVirtualKeyboard = () => {
         span.addEventListener('click', () => grid.onKeyup(charCode));
         bottomRow.appendChild(span);
     }
+}
+
+const addEventListeners = () => {
+    document.addEventListener('keyup', (event) => {
+        if (document.activeElement === document.getElementById('def-input')) {
+            if (event.key === 'Enter') {
+                console.log('submit called on clue-form');
+                const modalDiv = document.getElementById('clue-editor-modal');
+                const modal = bootstrap.Modal.getInstance(modalDiv);
+                modal.hide();
+            }
+            return;
+        }
+        grid.onKeyup(event.keyCode);
+    });
+
+    document.getElementById('clear-clue-button').addEventListener('click', (e) => {
+
+        const thisClue = grid.currentHighlightedClue;
+        if (!thisClue) {
+            return;
+        }
+
+        // Remove all characters from the current selected clue, except those in
+        // use by intersecting clues.
+        for (let cell of thisClue.cellList) {
+
+            // Check if cell is in use by an intersecting (and complete) solution. If so, 
+            // don't erase it.
+            if (cell.clueAcross && cell.clueDown) {
+                const intersector = thisClue.orientation === "AC" ? cell.clueDown : cell.clueAcross;
+                let allCellsFilled = true;
+                for (let c of intersector.cellList) {
+                    if (c.value === OPEN) {
+                        allCellsFilled = false;
+                    }
+                }
+                if (allCellsFilled) {
+                    continue;
+                }
+            }
+
+            // Remove each cell's value
+            cell.value = OPEN;
+
+            // Clear the current clue div cell
+            const clueSpan = document.getElementById(`cluespan-${cell.index}`);
+            clueSpan.innerText = '_';
+
+            // Clear the main crossword cell span
+            const cellValueSpan = document.getElementById(`cellvaluespan-${cell.index}`);
+            cellValueSpan.innerText = '';
+        }
+    });
+
+    document.getElementById('matches-button').addEventListener('click', (event) => {
+
+        // Show the word matches modal
+        const queryString = getWordFromClueDiv();
+        const url = `/builder/query/${queryString}`;
+        const matchesDiv = document.getElementById('matches-div');
+        matchesDiv.textContent = '';
+        fetch(url).then(response => response.json())
+            .then(json => {
+                const results = json.results;
+                const count = results.length;
+                document.getElementById('matches-modal-title').innerText = `Matches (${count})`;
+                for (let item of results) {
+                    const span = document.createElement('span');
+                    span.classList.add('match-word');
+                    span.innerText = item;
+                    span.addEventListener('click', (event) => {
+                        replaceCurrentClue(item);
+                        const modalDiv = document.getElementById('matches-modal');
+                        const modal = bootstrap.Modal.getInstance(modalDiv);
+                        modal.hide();
+                    });
+                    matchesDiv.appendChild(span);
+                }
+            });
+    });
+
+    document.getElementById('save-button').addEventListener('click', (event) => {
+        const list = [];
+        for (let clue of grid.clues) {
+            list.push(clue.convertToObject());
+        }
+        const gridString = grid.getGridObject();
+        const payload = JSON.stringify({
+            'puzzle_id': null,
+            'clues': list,
+            'grid': gridString,
+        });
+        const url = '/builder/save_puzzle/';
+        const options = {
+            method: 'POST',
+            body: payload,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            }
+        }
+        fetch(url, options).then(response => {
+            if (response.ok) {
+                alert('Crossword saved successfully');
+            }
+        });
+    });
+
+    document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {
+        unSelectCurrentClue(event);
+        grid.currentHighlightedCell = null;
+        grid.currentHighlightedClue = null;
+
+        const currentItemHolder = document.getElementById("current-item-holder");
+
+        if (!event.target.checked) {
+            clearExistingClueNumbers();
+            grid.reindex();
+            rerenderClueNumbers();
+            currentItemHolder.classList.remove('d-none');
+        } else {
+            currentItemHolder.classList.add('d-none');
+        }
+    });
+
+    const clueEditorButton = document.getElementById('clue-editor-button');
+    clueEditorButton.addEventListener('click', (event) => {
+        const word = getWordFromClueDiv();
+        getDefinition(word);
+    });
+
+    document.getElementById('def-input').addEventListener('input', (event) => {
+        if (grid.currentHighlightedClue) {
+            grid.currentHighlightedClue.clue = event.target.value;
+            displayClue(grid.currentHighlightedClue.clue);
+        }
+
+    });
+
+    document.getElementById('word-lengths-input').addEventListener('input', (e) => {
+        if (grid.currentHighlightedClue) {
+            grid.currentHighlightedClue.word_lengths = e.target.value;
+        }
+    });
 }
 
 
