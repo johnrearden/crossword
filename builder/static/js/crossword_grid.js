@@ -77,8 +77,6 @@ export class Grid {
 
     reindex = () => {
 
-        console.log('reindexing grid');
-
         // Clear the grid's clue list.
         this.clues = [];
 

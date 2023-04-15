@@ -57,14 +57,6 @@ class GetDefinition(APIView):
         return JsonResponse({'results': def_list})
 
 
-class GridEditor(UserPassesTestMixin, View):
-    def get(self, request):
-        return render(request, 'builder/grid_editor.html')
-
-    def test_func(self):
-        return self.request.user.is_staff
-
-
 class PuzzleEditor(UserPassesTestMixin, View):
     def get(self, request, puzzle_id):
         puzzle = get_object_or_404(CrosswordPuzzle, pk=puzzle_id)
@@ -130,18 +122,21 @@ class SavePuzzle(APIView):
 
 class GetRecentPuzzles(UserPassesTestMixin, APIView):
     def get(self, request, puzzle_count):
-        puzzle = CrosswordPuzzle.objects \
-                                 .order_by('last_edited')[0]
-        clues = CrosswordClue.objects.filter(puzzle=puzzle)
-        puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
-        print(puzzle_serializer.data)
-        clue_serialzer = CrosswordClueSerializer(clues, many=True)
-        data = {
-            'puzzle': puzzle_serializer.data,
-            'clues': clue_serialzer.data,
-        }
-
-        return Response(data)
+        puzzles = CrosswordPuzzle.objects \
+                                 .order_by('last_edited')[:puzzle_count]
+        print(puzzles)
+        puzzle_list = []
+        for puzzle in puzzles:
+            clues = CrosswordClue.objects.filter(puzzle=puzzle)
+            puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
+            clue_serialzer = CrosswordClueSerializer(clues, many=True)
+            data = {
+                'puzzle': puzzle_serializer.data,
+                'clues': clue_serialzer.data,
+            }
+            puzzle_list.append(data)
+        
+        return Response({'puzzles': puzzle_list})
 
     def test_func(self):
         return self.request.user.is_staff

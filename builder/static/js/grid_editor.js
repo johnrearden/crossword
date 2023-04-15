@@ -20,10 +20,9 @@ const renderSolutions = (clues) => {
             const xCoor = clue.orientation === 'AC' ? clue.start_col + i : clue.start_col;
             const yCoor = clue.orientation === 'AC' ? clue.start_row : clue.start_row + i;
             const index = xCoor + yCoor * grid.width;
-            console.log(`x: ${xCoor}, y: ${yCoor}, index : ${index}`);
             const span = document.getElementById(`cellvaluespan-${index}`);
             const character = clue.solution[i];
-            span.innerText = character;
+            span.innerText = character === OPEN ? '' : character;
             grid.cells[index].value = character === OPEN ? OPEN : character;
         }
     }
