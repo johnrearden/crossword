@@ -72,7 +72,8 @@ body {
 
 .highlighted-cell {
     box-sizing: border-box;
-    border : 1px solid blue;
+    border : 2px solid red;
+    background-color: yellow;
 }
 
 .highlighted-clue {

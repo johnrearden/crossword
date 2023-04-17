@@ -8,7 +8,7 @@ let keyboardDisplayed = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const data = JSON.parse(document.getElementById('data').textContent);
-    grid = new Grid(data.puzzle.grid);
+    grid = new Grid(data.puzzle.grid, data.clues);
     drawGrid(grid);
     renderSolutions(data.clues);
     populateVirtualKeyboard();
@@ -47,7 +47,7 @@ const drawGrid = (grid) => {
         cellDiv.id = `cellDiv-${i}`;
         cellDiv.classList.add('cell-div');
         cellValueSpan.id = `cellvaluespan-${i}`;
-        cellDiv.classList.add(cells[i].value === OPEN ? 'open' : 'blank');
+        cellDiv.classList.add(cells[i].isOpen ? 'open' : 'blank');
         cellValueSpan.classList.add('cell-value-span');
         cellDiv.appendChild(cellValueSpan);
 
@@ -66,7 +66,7 @@ const drawGrid = (grid) => {
                 event.target.classList.toggle('open');
                 event.target.classList.toggle('blank');
                 const cellIndex = event.target.id.split('-')[1];
-                cells[cellIndex].value = cells[cellIndex].value === CLOSED ? OPEN : CLOSED;
+                cells[cellIndex].isOpen = !cells[cellIndex].isOpen;
 
                 // Reindex the grid, clearing the clue numbers beforehand, and rendering the new ones
                 // afterwards
@@ -74,7 +74,7 @@ const drawGrid = (grid) => {
                 grid.reindex();
                 rerenderClueNumbers();
 
-            } else if (clickedCell.value !== CLOSED) {
+            } else if (clickedCell.isOpen) {
                 // Remove highlighting from previous cell and clue. Clear the definition and 
                 // word length inputs
                 document.getElementById('def-input').value = '';
@@ -111,22 +111,6 @@ const drawGrid = (grid) => {
                 cellDiv.classList.add('highlighted-cell');
                 grid.currentHighlightedClue = currentClue;
                 grid.currentHighlightedCell = clickedCell;
-
-                // Render the current highlighted clue in the clue query box.
-                const clueDiv = document.getElementById('current-clue-div');
-                const newSpans = [];
-                for (let cell of cellsToHighlight) {
-                    const span = document.createElement('span');
-                    span.id = `cluespan-${cell.index}`;
-                    span.classList.add('highlighted-clue', 'clue-character');
-                    if (cell == grid.currentHighlightedCell) {
-                        span.classList.add('highlighted-cell');
-                    }
-                    span.innerText = cell.value === OPEN ? '_' : cell.value;
-                    newSpans.push(span);
-                }
-
-                clueDiv.replaceChildren(...newSpans);
 
                 // Replace the contents of the definition and word lengths inputs, and display the current clue
                 document.getElementById('def-input').value = grid.currentHighlightedClue.clue;
@@ -224,10 +208,6 @@ const replaceCurrentClue = (str) => {
         // Change the grid
         const cellValueSpan = document.getElementById(`cellvaluespan-${cell.index}`);
         cellValueSpan.innerText = str[i];
-
-        // Change the currently selected clue div
-        const clueSpan = document.getElementById(`cluespan-${cell.index}`);
-        clueSpan.innerText = str[i];
     }
 }
 
@@ -261,17 +241,21 @@ const displayClue = (clue) => {
 }
 
 /**
- * Builds a string from the contents of the current clue div.
+ * Builds a string from the contents of the current clue (property of the grid object).
  * 
  * @returns A string representation of the letters currently in the current-clue-div
  */
-const getWordFromClueDiv = () => {
-    const clueDiv = document.getElementById('current-clue-div');
+const getWordFromCurrentClue = () => {
+    const clue = grid.currentHighlightedClue;
+    const solution = clue.solution;
+    console.log(`solution is ${solution}`);
     const query = [];
-    for (let child of clueDiv.children) {
-        query.push(child.innerText);
+    for (let c of solution) {
+        const char = c === '' ? '_' : c;
+        query.push(char);
     }
     const result = query.join('');
+    console.log(`result == ${result}`);
     return result || '';
 }
 
@@ -386,7 +370,7 @@ const addEventListeners = () => {
                 const intersector = thisClue.orientation === "AC" ? cell.clueDown : cell.clueAcross;
                 let allCellsFilled = true;
                 for (let c of intersector.cellList) {
-                    if (c.value === OPEN) {
+                    if (c.isOpen) {
                         allCellsFilled = false;
                     }
                 }
@@ -396,11 +380,7 @@ const addEventListeners = () => {
             }
 
             // Remove each cell's value
-            cell.value = OPEN;
-
-            // Clear the current clue div cell
-            const clueSpan = document.getElementById(`cluespan-${cell.index}`);
-            clueSpan.innerText = '_';
+            cell.value = '';
 
             // Clear the main crossword cell span
             const cellValueSpan = document.getElementById(`cellvaluespan-${cell.index}`);
@@ -411,7 +391,8 @@ const addEventListeners = () => {
     document.getElementById('matches-button').addEventListener('click', (event) => {
 
         // Show the word matches modal
-        const queryString = getWordFromClueDiv();
+        const queryString = getWordFromCurrentClue();
+        console.log(`queryString is '${queryString}`);
         const url = `/builder/query/${queryString}`;
         const matchesDiv = document.getElementById('matches-div');
         matchesDiv.textContent = '';

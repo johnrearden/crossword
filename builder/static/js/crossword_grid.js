@@ -33,10 +33,11 @@ export class Clue {
 }
 
 export class Cell {
-    constructor(row, col, value, index) {
+    constructor(row, col, value, isOpen, index) {
         this.row = row;
         this.col = col;
         this.value = value;
+        this.isOpen = isOpen;
         this.index = index;
         this.clueAcross = null;
         this.clueDown = null;
@@ -44,7 +45,7 @@ export class Cell {
 }
 
 export class Grid {
-    constructor(gridAsJSON) {
+    constructor(gridAsJSON, clueData) {
         this.width = gridAsJSON.width;
         this.height = gridAsJSON.height;
         this.cells = []
@@ -55,10 +56,26 @@ export class Grid {
             const cell = new Cell(
                 Math.floor(i / this.width),
                 i % this.width,
-                gridAsJSON.cells[i],
+                '',
+                gridAsJSON.cells[i] === '#',
                 i);
             this.cells.push(cell);
         }
+        for (let item of clueData) {
+            const newClue = new Clue(item.start_row, item.start_col, item.orientation);
+            newClue.clue = item.clue;
+            newClue.solution = item.solution.toLowerCase().split('');
+            this.clues.push(newClue);
+
+            // Give each cell in this.cells its correct value
+            const startIndex = newClue.startCol + newClue.startRow * this.width;
+            for (let i = 0; i < newClue.solution.length; i++) {
+                const or = newClue.orientation
+                const index = or === 'AC' ? startIndex + i : startIndex + i * this.width;
+                this.cells[index].value = newClue.solution[i].toLowerCase();
+            }
+        }
+
         this.reindex();
     }
 
@@ -77,6 +94,18 @@ export class Grid {
 
     reindex = () => {
 
+        // Place the clues in a Map keyed by their solutions, so that their clue and wordLength
+        // fields can be conserved as long as the cells they previously occupied have not been deleted.
+        const clueCache = new Map();
+        const wordLengthCache = new Map();
+        for (let item of this.clues) {
+            const key = item.solution.join('');
+            if (!key.includes(OPEN)) {
+                clueCache.set(key, item.clue);
+                wordLengthCache.set(key, item.word_lengths);
+            }
+        }
+
         // Clear the grid's clue list.
         this.clues = [];
 
@@ -92,7 +121,7 @@ export class Grid {
         for (let i = 0; i < this.cells.length; i++) {
 
             // If cell is closed, skip it - it's not part of a clue
-            if (this.cells[i].value === CLOSED) {
+            if (!this.cells[i].isOpen) {
                 continue;
             }
 
@@ -115,6 +144,7 @@ export class Grid {
                 this.clues.push(clue);
                 this.cells[i].clueAcross = clue;
                 clue.solution[0] = this.cells[i].value;
+
             }
 
             // If cell has a left neighbour, it shares the same clue reference.
@@ -152,6 +182,7 @@ export class Grid {
                 sharedClue.solution[sharedClue.len - 1] = this.cells[i].value;
             }
         }
+
 
         // Calculate numbers for each clue, considering AC and DN separately.
         // However, an AC and a DN clue can start in the same cell, and should
@@ -222,14 +253,22 @@ export class Grid {
             }
         }
 
-        // Set the default word lengths attribute to the length of the clue
-        for (let clue of this.clues) {
-            clue.word_lengths = `(${clue.len})`;
+        // Finally, look up the clueCache and wordLengthCache maps. If the clue's solution
+        // is among the keys, the solution and its cells are unchanged, and the clue and 
+        // word_length can be conserved.
+        for (let item of this.clues) {
+            const key = item.solution.join('');
+            if (clueCache.get(key)) {
+                item.clue = clueCache.get(key);
+            }
+            if (wordLengthCache.get(key)) {
+                item.word_lengths = wordLengthCache.get(key);
+            } else {
+                item.word_lengths = `(${item.len})`;
+            }
         }
 
-        /* for (let clue of this.clues) {
-            console.log(`Clue (${clue.startCol},${clue.startRow}) : number == ${clue.number}`);
-        } */
+
     }
 
     // Handle a keyup event on the document
@@ -238,8 +277,8 @@ export class Grid {
         if (document.activeElement === document.getElementById('def-input')) {
             return;
         }
-        const cell = this.currentHighlightedCell;
-        const clue = this.currentHighlightedClue;
+        let cell = this.currentHighlightedCell;
+        let clue = this.currentHighlightedClue;
         const cellListIndex = clue.cellList.indexOf(cell);
 
         // Handle a letter key being released.
@@ -247,26 +286,24 @@ export class Grid {
         const keyIsSpace = keyCode === 32;
         if (keyIsLetter || keyIsSpace) {
             const character = String.fromCharCode(keyCode);
-            cell.value = keyIsLetter ? character : OPEN;
+            cell.value = keyIsLetter ? character : '';
             const index = cell.index;
             const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
-            cellValueSpan.innerText = character;
-            const clueSpan = document.getElementById(`cluespan-${index}`);
-            clueSpan.innerText = keyIsLetter ? character : '_';
+            cellValueSpan.innerText = cell.value;
+
+            // Set the character in the currentHighlightedClue
+            const solutionIndex = clue.cellList.indexOf(cell);
+            clue.solution[solutionIndex] = cell.value;
 
             // If not at end of clue, advance the currentHighlightedClue
             // to the next clue on the cellList.
             if (cellListIndex < clue.len - 1) {
                 let cellDiv = document.getElementById(`cellDiv-${cell.index}`);
-                let clueSpan = document.getElementById(`cluespan-${cell.index}`);
                 cellDiv.classList.remove('highlighted-cell');
-                clueSpan.classList.remove('highlighted-cell');
                 this.currentHighlightedCell = clue.cellList[cellListIndex + 1];
                 const i = this.currentHighlightedCell.index;
                 cellDiv = document.getElementById(`cellDiv-${i}`);
-                clueSpan = document.getElementById(`cluespan-${i}`);
                 cellDiv.classList.add('highlighted-cell');
-                clueSpan.classList.add('highlighted-cell');
             }
         }
 
@@ -278,41 +315,42 @@ export class Grid {
                 const index = this.currentHighlightedCell.index;
                 const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
                 cellValueSpan.innerText = '';
-                const clueSpan = document.getElementById(`cluespan-${index}`);
-                clueSpan.innerText = '_';
-                this.currentHighlightedCell.value = OPEN;
+                cell.value = '';
+                cell.isOpen = true;
+
+                // Update the current clue's solution
+                const solutionIndex = clue.cellList.indexOf(cell);
+                clue.solution[solutionIndex] = '';
+
                 if (cellListIndex > 0) {
                     let cellDiv = document.getElementById(`cellDiv-${cell.index}`);
-                    let clueSpan = document.getElementById(`cluespan-${cell.index}`);
                     cellDiv.classList.remove('highlighted-cell');
-                    clueSpan.classList.remove('highlighted-cell');
                     this.currentHighlightedCell = clue.cellList[cellListIndex - 1];
                     const i = this.currentHighlightedCell.index;
                     cellDiv = document.getElementById(`cellDiv-${i}`);
-                    clueSpan = document.getElementById(`cluespan-${i}`);
                     cellDiv.classList.add('highlighted-cell');
-                    clueSpan.classList.add('highlighted-cell');
                 }
             } else {
                 // The index should be moved back, and then that cell cleared.
                 if (cellListIndex > 0) {
                     let cellDiv = document.getElementById(`cellDiv-${cell.index}`);
-                    let clueSpan = document.getElementById(`cluespan-${cell.index}`);
                     cellDiv.classList.remove('highlighted-cell');
-                    clueSpan.classList.remove('highlighted-cell');
                     this.currentHighlightedCell = clue.cellList[cellListIndex - 1];
                     const i = this.currentHighlightedCell.index;
                     cellDiv = document.getElementById(`cellDiv-${i}`);
-                    clueSpan = document.getElementById(`cluespan-${i}`);
                     cellDiv.classList.add('highlighted-cell');
-                    clueSpan.classList.add('highlighted-cell');
                 }
                 const index = this.currentHighlightedCell.index;
                 const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
                 cellValueSpan.innerText = '';
-                const clueSpan = document.getElementById(`cluespan-${index}`);
-                clueSpan.innerText = '_';
-                this.currentHighlightedCell.value = OPEN;
+                this.currentHighlightedCell.value = '';
+                this.currentHighlightedCell.isOpen = true;
+
+                // Update the current clue's solution
+                let cell = this.currentHighlightedCell;
+                let clue = this.currentHighlightedClue;
+                const solutionIndex = clue.cellList.indexOf(cell);
+                clue.solution[solutionIndex] = '';
             }
         }
     }
@@ -323,7 +361,7 @@ const hasLeftNeighbour = (cell, grid) => {
         return false;
     }
     const index = getCellIndex(cell, grid);
-    return grid.cells[index - 1].value !== CLOSED;
+    return grid.cells[index - 1].isOpen;
 }
 
 const hasRightNeighbour = (cell, grid) => {
@@ -331,7 +369,7 @@ const hasRightNeighbour = (cell, grid) => {
         return false;
     }
     const index = getCellIndex(cell, grid);
-    return grid.cells[index + 1].value !== CLOSED;
+    return grid.cells[index + 1].isOpen;
 }
 
 const hasTopNeighbour = (cell, grid) => {
@@ -339,7 +377,7 @@ const hasTopNeighbour = (cell, grid) => {
         return false;
     }
     const index = getCellIndex(cell, grid);
-    return grid.cells[index - grid.width].value !== CLOSED;
+    return grid.cells[index - grid.width].isOpen;
 }
 
 const hasBottomNeighbour = (cell, grid) => {
@@ -347,7 +385,7 @@ const hasBottomNeighbour = (cell, grid) => {
         return false;
     }
     const index = getCellIndex(cell, grid);
-    return grid.cells[index + grid.width].value !== CLOSED;
+    return grid.cells[index + grid.width].isOpen;
 }
 
 export const getCellIndex = (cell, grid) => {

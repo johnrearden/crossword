@@ -16,7 +16,7 @@ const renderThumbnails = (json) => {
         const createdDate = new Date(item.puzzle.created_on);
         let dayName = new Intl.DateTimeFormat("en-UK", { weekday: "short" }).format(createdDate);
         const createdDateString = dayName + " " + createdDate.toLocaleString();
-        const lastEditDate = new Date(item.puzzle.created_on);
+        const lastEditDate = new Date(item.puzzle.last_edited);
         dayName = new Intl.DateTimeFormat("en-UK", { weekday: "short" }).format(createdDate);
         const lastEditDateString = dayName + " " + createdDate.toLocaleString();
         title.innerText = `Created by ${item.puzzle.creator} on ${lastEditDateString}`;
@@ -58,6 +58,7 @@ const createThumbnail = (puzzle, clues) => {
     }
 
     for (let clue of clues) {
+        console.log(clue.solution);
         const startRow = parseInt(clue.start_row);
         const startCol = parseInt(clue.start_col);
         const width = parseInt(grid.width);

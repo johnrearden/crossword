@@ -123,8 +123,7 @@ class SavePuzzle(APIView):
 class GetRecentPuzzles(UserPassesTestMixin, APIView):
     def get(self, request, puzzle_count):
         puzzles = CrosswordPuzzle.objects \
-                                 .order_by('last_edited')[:puzzle_count]
-        print(puzzles)
+                                 .order_by('-last_edited')[:puzzle_count]
         puzzle_list = []
         for puzzle in puzzles:
             clues = CrosswordClue.objects.filter(puzzle=puzzle)
