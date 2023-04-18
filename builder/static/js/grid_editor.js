@@ -61,12 +61,26 @@ const drawGrid = (grid) => {
         cellDiv.addEventListener('click', (event) => {
             const clickedCellIndex = event.target.id.split('-')[1];
             const clickedCell = cells[clickedCellIndex];
+            console.log(`cell ${clickedCellIndex} clicked`);
 
             if (isEditingLayout()) {
-                event.target.classList.toggle('open');
-                event.target.classList.toggle('blank');
                 const cellIndex = event.target.id.split('-')[1];
-                cells[cellIndex].isOpen = !cells[cellIndex].isOpen;
+                const cell = cells[cellIndex];
+
+                if (cell.isOpen) {
+                    const div = document.getElementById(`cellDiv-${cellIndex}`);
+                    div.classList.remove('open');
+                    div.classList.add('blank');
+                    cell.value = '';
+                    const span = document.getElementById(`cellvaluespan-${cellIndex}`);
+                    span.innerText = '';
+                    cell.isOpen = false;
+                } else {
+                    const div = document.getElementById(`cellDiv-${cellIndex}`);
+                    div.classList.remove('blank');
+                    div.classList.add('open');
+                    cell.isOpen = true;
+                }
 
                 // Reindex the grid, clearing the clue numbers beforehand, and rendering the new ones
                 // afterwards
@@ -185,9 +199,7 @@ const unSelectCurrentClue = (event) => {
     }
     for (let cell of grid.currentHighlightedClue.cellList) {
         let cellDiv = document.getElementById(`cellDiv-${cell.index}`);
-        let clueSpan = document.getElementById(`cluespan-${cell.index}`);
         cellDiv.classList.remove('highlighted-cell', 'highlighted-clue');
-        clueSpan.classList.remove('highlighted-cell', 'highlighted-clue');
     }
 }
 
@@ -215,7 +227,6 @@ const replaceCurrentClue = (str) => {
 // Fetch the definition for the clicked word and display it.
 const getDefinition = (word) => {
     const url = `/builder/get_definition/${word}/`;
-    console.log(url);
     fetch(url).then(res => res.json())
         .then(json => {
             const results = json.results;
@@ -248,14 +259,12 @@ const displayClue = (clue) => {
 const getWordFromCurrentClue = () => {
     const clue = grid.currentHighlightedClue;
     const solution = clue.solution;
-    console.log(`solution is ${solution}`);
     const query = [];
     for (let c of solution) {
         const char = c === '' ? '_' : c;
         query.push(char);
     }
     const result = query.join('');
-    console.log(`result == ${result}`);
     return result || '';
 }
 
@@ -370,7 +379,7 @@ const addEventListeners = () => {
                 const intersector = thisClue.orientation === "AC" ? cell.clueDown : cell.clueAcross;
                 let allCellsFilled = true;
                 for (let c of intersector.cellList) {
-                    if (c.isOpen) {
+                    if (c.value == '') {
                         allCellsFilled = false;
                     }
                 }
@@ -463,7 +472,7 @@ const addEventListeners = () => {
 
     const clueEditorButton = document.getElementById('clue-editor-button');
     clueEditorButton.addEventListener('click', (event) => {
-        const word = getWordFromClueDiv();
+        const word = getWordFromCurrentClue();
         getDefinition(word);
     });
 
