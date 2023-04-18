@@ -16,7 +16,7 @@ class CrosswordClueAdmin(admin.ModelAdmin):
                     'start_col', 'start_row', 'created_on', 'creator',
                     'puzzle',)
     list_editable = ('clue', 'solution', 'word_lengths', 'orientation',
-                     'start_col', 'start_row',)
+                     'start_col', 'start_row', 'puzzle')
 
 
 admin.site.register(Grid, GridAdmin)

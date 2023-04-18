@@ -82,7 +82,7 @@ export class Grid {
     getGridObject = () => {
         const cellValues = [];
         for (let cell of this.cells) {
-            const value = cell.value === '-' ? '-' : '#';
+            const value = cell.isOpen ? '#' : '-';
             cellValues.push(value);
         }
         return {
@@ -279,6 +279,11 @@ export class Grid {
         }
         let cell = this.currentHighlightedCell;
         let clue = this.currentHighlightedClue;
+
+        // Ignore keypresses unless there is a cell and clue currently highlighted
+        if (!clue || !cell) {
+            return;
+        }
         const cellListIndex = clue.cellList.indexOf(cell);
 
         // Handle a letter key being released.

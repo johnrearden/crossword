@@ -3,12 +3,14 @@ import { OPEN, CLOSED } from './crossword_grid.js';
 import { getCellIndex } from './crossword_grid.js';
 
 let grid;
+let puzzleID;
 let throttled = false;
 let keyboardDisplayed = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const data = JSON.parse(document.getElementById('data').textContent);
     grid = new Grid(data.puzzle.grid, data.clues);
+    puzzleID = data.puzzle.id;
     drawGrid(grid);
     renderSolutions(data.clues);
     populateVirtualKeyboard();
@@ -61,7 +63,6 @@ const drawGrid = (grid) => {
         cellDiv.addEventListener('click', (event) => {
             const clickedCellIndex = event.target.id.split('-')[1];
             const clickedCell = cells[clickedCellIndex];
-            console.log(`cell ${clickedCellIndex} clicked`);
 
             if (isEditingLayout()) {
                 const cellIndex = event.target.id.split('-')[1];
@@ -258,10 +259,9 @@ const displayClue = (clue) => {
  */
 const getWordFromCurrentClue = () => {
     const clue = grid.currentHighlightedClue;
-    const solution = clue.solution;
     const query = [];
-    for (let c of solution) {
-        const char = c === '' ? '_' : c;
+    for (let c of clue.cellList) {
+        const char = c.value === '' || c.value === OPEN ? '_' : c.value;
         query.push(char);
     }
     const result = query.join('');
@@ -352,7 +352,6 @@ const addEventListeners = () => {
     document.addEventListener('keyup', (event) => {
         if (document.activeElement === document.getElementById('def-input')) {
             if (event.key === 'Enter') {
-                console.log('submit called on clue-form');
                 const modalDiv = document.getElementById('clue-editor-modal');
                 const modal = bootstrap.Modal.getInstance(modalDiv);
                 modal.hide();
@@ -432,7 +431,7 @@ const addEventListeners = () => {
         }
         const gridString = grid.getGridObject();
         const payload = JSON.stringify({
-            'puzzle_id': null,
+            'puzzle_id': puzzleID,
             'clues': list,
             'grid': gridString,
         });
@@ -446,11 +445,13 @@ const addEventListeners = () => {
                 'X-CSRFToken': getCookie('csrftoken'),
             }
         }
-        fetch(url, options).then(response => {
-            if (response.ok) {
+        fetch(url, options)
+            .then(response => response.json())
+            .then(json => {
                 alert('Crossword saved successfully');
-            }
-        });
+                puzzleID = json.puzzle_id;
+                console.log(`Puzzle id is now ${puzzleID}`);
+            });
     });
 
     document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {

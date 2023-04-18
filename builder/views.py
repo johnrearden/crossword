@@ -81,13 +81,26 @@ class GetGrid(APIView):
         return Response(serializer.data)
 
 
-class SavePuzzle(APIView):
+class SavePuzzle(UserPassesTestMixin, APIView):
     def post(self, request, *args, **kwargs):
+        clues_data = request.data['clues']
         if request.data['puzzle_id']:
-            print('puzzle has id')
+
+            # Update the puzzle grid's cells field
+            id = int(request.data['puzzle_id'])
+            puzzle = get_object_or_404(CrosswordPuzzle, pk=id)
+            grid_data = request.data['grid']
+            puzzle.grid.cells = grid_data['grid_string']
+            puzzle.grid.save()
+
+            # Remove any clues previously associated with this puzzle.
+            CrosswordClue.objects.filter(puzzle=puzzle).delete()
+
+            # Save the updated puzzle
+            puzzle.save()
+
         else:
             grid_data = request.data['grid']
-            clues_data = request.data['clues']
 
             # Create a grid
             grid = Grid.objects.create(
@@ -103,21 +116,24 @@ class SavePuzzle(APIView):
                 creator=request.user,
             )
 
-            # Create the clues
-            for item in clues_data:
-                CrosswordClue.objects.create(
-                    puzzle=puzzle,
-                    creator=request.user,
-                    clue=item['clue'],
-                    clue_number=item['clue_number'],
-                    solution=item['solution'],
-                    word_lengths=item['word_lengths'],
-                    orientation=item['orientation'],
-                    start_row=item['start_row'],
-                    start_col=item['start_col'],
-                )
+        # In both cases, we need to create new clues from the api call data
+        for item in clues_data:
+            CrosswordClue.objects.create(
+                puzzle=puzzle,
+                creator=request.user,
+                clue=item['clue'],
+                clue_number=item['clue_number'],
+                solution=item['solution'],
+                word_lengths=item['word_lengths'],
+                orientation=item['orientation'],
+                start_row=item['start_row'],
+                start_col=item['start_col'],
+            )
 
-        return Response('You betcha')
+        return JsonResponse({'puzzle_id': puzzle.id})
+
+    def test_func(self):
+        return self.request.user.is_staff
 
 
 class GetRecentPuzzles(UserPassesTestMixin, APIView):
