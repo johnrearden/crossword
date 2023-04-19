@@ -12,4 +12,6 @@ urlpatterns = [
          views.GetRecentPuzzles.as_view(),
          name='get_recent_puzzles'),
     path('puzzle_editor/<int:puzzle_id>/', views.PuzzleEditor.as_view()),
+    path('create_new_puzzle/', views.CreateNewPuzzle.as_view(),
+         name='create_new_puzzle'),
 ]

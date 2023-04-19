@@ -7,12 +7,36 @@
 
 {% block content %}
 
-<div class="container-fluid mt-5">
+<div class="container-fluid mt-3">
     <div class="row justify-content-center">
         <div class="col-12">
-            <a href="#">Create New Puzzle</a>
+            <h3>Create New Puzzle</h3>
+            <form id="new-puzzle-form">
+                <div class="row">
+                    <div class="col-2">
+                        <label for="col-count">Columns</label>
+                    </div>
+                    <div class="col">
+                        <input type="number" id="col-count" max="25" min="3" value="13">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <label for="row-count">Rows</label>
+                    </div>
+                    <div class="col">
+                        <input type="number" id="row-count" max="25" min="3" value="13">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <input type="submit" value="Generate">
+                    </div>
+                </div>
+            </form>
         </div>
-        <div class="col-12">
+        <hr class="mt-5">
+        <div class="col-12 mt-3">
             <h3>Work on recently edited puzzle</h3>
             <div id="thumbnail-holder"></div>
         </div>

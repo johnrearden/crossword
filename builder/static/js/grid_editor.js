@@ -1,6 +1,7 @@
 import { Grid } from './crossword_grid.js';
 import { OPEN, CLOSED } from './crossword_grid.js';
-import { getCellIndex } from './crossword_grid.js';
+import { getCellIndex} from './crossword_grid.js';
+
 
 let grid;
 let puzzleID;
@@ -37,8 +38,11 @@ const renderClues = (clues) => {
     for (let item of clues) {
         const para = document.createElement('p');
         const text = item.clue ? item.clue : 'No clue yet.';
-        para.innerText = `${item.number}: ${item.clue}`;
+        para.innerText = `${item.number}: ${text}`;
         para.id = `cluepara-${item.number}-${item.orientation}`;
+        if (!item.clue) {
+            para.classList.add('text-muted');
+        }
         if (item.orientation === 'AC') {
             acrossDiv.appendChild(para);
         } else {
@@ -144,9 +148,6 @@ const drawGrid = (grid) => {
                     currentClue = clickedCell.clueAcross || clickedCell.clueDown;
 
                 }
-
-                console.log(currentClue);
-                console.log(clickedCell);
 
                 const cellsToHighlight = getClueCells(currentClue, grid);
                 for (let cell of cellsToHighlight) {
@@ -355,7 +356,6 @@ const setCrosswordCellWidth = (grid) => {
 }
 
 const populateVirtualKeyboard = () => {
-    const keyboardDiv = document.getElementById('virtual-keyboard');
     const topRow = document.getElementById('vk-top-row');
     const middleRow = document.getElementById('vk-middle-row');
     const bottomRow = document.getElementById('vk-bottom-row');

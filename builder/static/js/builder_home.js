@@ -6,10 +6,57 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(json => renderThumbnails(json))
 });
 
+document.getElementById('new-puzzle-form').addEventListener('submit', (event) => {
+
+    // Handle submission in this function
+    event.preventDefault();
+
+
+    // Create a generic cellString with a uniform crosshatched pattern
+    const rows = document.getElementById('row-count').value;
+    const cols = document.getElementById('col-count').value;
+    const array = [];
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (r % 2 === 0) {
+                array.push('#');
+            } else {
+                const symbol = c % 2 === 0 ? '#' : '-';
+                array.push(symbol);
+            }
+        }
+    }
+    const cellString = array.join('');
+
+    // Post the new puzzle data to the backend, and then redirect the user
+    // to the puzzle editor using the new puzzle id returned in the response.
+    const url = "/builder/create_new_puzzle/";
+    const payload = JSON.stringify({
+        'width': cols,
+        'height': rows,
+        'cells': cellString,
+    });
+    const options = {
+        method: 'POST',
+        body: payload,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    } 
+    fetch(url, options)
+        .then(response => response.json())
+        .then(json => {
+            window.location = `/builder/puzzle_editor/${json.new_puzzle_id}`;
+        });
+});
+
 
 const renderThumbnails = (json) => {
     const puzzleList = json.puzzles;
     const thumbnailHolder = document.getElementById('thumbnail-holder');
+    const hr = document.createElement('hr');
     for (let item of puzzleList) {
         const title = document.createElement('h6');
         const lastEditedTitle = document.createElement('h6');
@@ -27,6 +74,7 @@ const renderThumbnails = (json) => {
         container.addEventListener('click', (e) => {
             redirectToPuzzleEditor(item.puzzle.id);
         });
+        
         thumbnailHolder.appendChild(container);
     }
 }
@@ -76,3 +124,24 @@ const createThumbnail = (puzzle, clues) => {
 
     return container;
 }
+
+/**
+ * Retrieves the document crsf cookie and returns it.
+ * @param {String} name 
+ * @returns the cookie value.
+ */
+const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+};

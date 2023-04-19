@@ -16,6 +16,9 @@
         <div class="col">
             <button id="save-button">Save</button>
         </div>
+        <div class="col">
+            <a href="/builder/">Home</a>
+        </div>
     </div>
 
     <!-- The main crossword grid editor -->
@@ -47,26 +50,29 @@
             </div>
         </div>
     </div>
+
+    <div class="row mt-2">
+        <div class="col-11 col-md-6 p-2 text-start">
+            <hr>
+            <h4><strong>Clues Across</strong></h4>
+            <div id="clues-across-list"></div>
+        </div>
+        <div class="col-11 col-md-6 p-2 text-start">
+            <hr>
+            <h4><strong>Clues Down</strong></h4>
+            <div id="clues-down-list"></div>
+        </div>
+    </div>
 </div>
 
-<div class="row mt-2 justify-content-center">
-    <div class="col-11 col-md-6 p-2">
-        <hr>
-        <h5>Clues Across</h5>
-        <div id="clues-across-list"></div>
-    </div>
-    <div class="col-11 col-md-6 p-2">
-        <hr>
-        <h5>Clues Down</h5>
-        <div id="clues-down-list"></div>
-    </div>
-</div>
+
 
 <!-- Virtual keyboard, appears only when a cell-group is selected, dismissed when modals opened-->
 <div id="virtual-keyboard" class="container-fluid d-md-none py-1">
     <div class="row justify-content-center" id="vk-top-row"></div>
     <div class="row justify-content-center" id="vk-middle-row"></div>
     <div class="row justify-content-center" id="vk-bottom-row"></div>
+    <span class="virtual-key close-button">X</span>
 </div>
 
 <!-- Matches modal : Displays all words in dictionary of equal length matching existing characters -->

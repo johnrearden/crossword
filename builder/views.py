@@ -150,8 +150,27 @@ class GetRecentPuzzles(UserPassesTestMixin, APIView):
                 'clues': clue_serialzer.data,
             }
             puzzle_list.append(data)
-        
+
         return Response({'puzzles': puzzle_list})
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+class CreateNewPuzzle(UserPassesTestMixin, APIView):
+    def post(self, request):
+        grid = Grid.objects.create(
+            creator=request.user,
+            width=request.data['width'],
+            height=request.data['height'],
+            cells=request.data['cells'],
+        )
+        puzzle = CrosswordPuzzle.objects.create(
+            creator=request.user,
+            grid=grid,
+        )
+
+        return JsonResponse({'new_puzzle_id': puzzle.id})
 
     def test_func(self):
         return self.request.user.is_staff
