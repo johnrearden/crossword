@@ -65,6 +65,7 @@ const drawGrid = (grid) => {
             const clickedCell = cells[clickedCellIndex];
 
             if (isEditingLayout()) {
+                // The user is editing the layout - toggling cells open and closed.
                 const cellIndex = event.target.id.split('-')[1];
                 const cell = cells[cellIndex];
 
@@ -95,6 +96,8 @@ const drawGrid = (grid) => {
                 document.getElementById('def-input').value = '';
                 document.getElementById('word-lengths-input').value = '';
                 if (grid.currentHighlightedClue) {
+
+                    // If there is a clue currently highlighted, remove the highlighting from it.
                     const cells = getClueCells(grid.currentHighlightedClue, grid);
                     for (let cell of cells) {
                         const index = getCellIndex(cell, grid);
@@ -103,18 +106,26 @@ const drawGrid = (grid) => {
                     }
                 }
 
-                // Highlight the current cell and clue. Toggle the down and across clues if both
-                // exist.
+                // Highlight the new cell and clue.
                 let currentClue = null;
                 if (grid.currentHighlightedCell == clickedCell && grid.currentHighlightedClue) {
+
+                    // Switch to opposite orientation if both exist.
                     if (grid.currentHighlightedClue.orientation === 'AC' && clickedCell.clueDown) {
                         currentClue = clickedCell.clueDown;
                     } else if (grid.currentHighlightedClue.orientation === 'DN' && clickedCell.clueAcross) {
                         currentClue = clickedCell.clueAcross;
+                    } else {
+                        // Otherwise, choose whichever clue exists.
+                        currentClue = clickedCell.clueAcross || clickedCell.clueDown;
                     }
                 } else {
                     currentClue = clickedCell.clueAcross || clickedCell.clueDown;
+
                 }
+
+                console.log(currentClue);
+                console.log(clickedCell);
 
                 const cellsToHighlight = getClueCells(currentClue, grid);
                 for (let cell of cellsToHighlight) {

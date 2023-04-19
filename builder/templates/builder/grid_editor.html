@@ -29,13 +29,13 @@
             <div class="row mt-2 align-items-center">
                 <div class="col">
                     <button id="clue-editor-button" class="letter-button" data-bs-toggle="modal" data-bs-target="#clue-editor-modal">
-                        ?
+                        Clue
                     </button>
-                    <button id="matches-button" class="letter-button" data-bs-toggle="modal" data-bs-target="#matches-modal">
-                        M
+                    <button id="matches-button" class="letter-button mx-3" data-bs-toggle="modal" data-bs-target="#matches-modal">
+                        Match
                     </button>
                     <button id="clear-clue-button" class="letter-button">
-                        C
+                        Delete
                     </button>
                 </div>
             </div>
@@ -82,7 +82,7 @@
             </div>
             <div class="modal-body">
                 <form id="clue-form" action="#">
-                    <input type="text" class="p-2 def-input mt-2" id="def-input">
+                    <textarea class="p-2 def-input mt-2" id="def-input" rows="4"></textarea>
                     <input type="text" class="p-2 mt-2" id="word-lengths-input">
                 </form>
                 <div id="definition-div"></div>

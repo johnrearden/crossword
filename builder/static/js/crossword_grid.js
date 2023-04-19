@@ -4,7 +4,6 @@ export const CLOSED = '-';
 export class Clue {
     constructor(startRow, startCol, orientation) {
         this.clue = '';
-        this.solution = [];
         this.cellList = [];
         this.word_lengths = '';
         this.orientation = orientation;
@@ -29,6 +28,14 @@ export class Clue {
             'start_col': this.startCol,
             'word_lengths': this.word_lengths,
         }
+    }
+
+    getCurrentSolution = () => {
+        const array = [];
+        for (let cell of this.cellList) {
+            array.push(cell.value);
+        }
+        return array.join('');
     }
 }
 
@@ -64,15 +71,16 @@ export class Grid {
         for (let item of clueData) {
             const newClue = new Clue(item.start_row, item.start_col, item.orientation);
             newClue.clue = item.clue;
-            newClue.solution = item.solution.toLowerCase().split('');
             this.clues.push(newClue);
 
             // Give each cell in this.cells its correct value
             const startIndex = newClue.startCol + newClue.startRow * this.width;
-            for (let i = 0; i < newClue.solution.length; i++) {
+            for (let i = 0; i < item.solution.length; i++) {
                 const or = newClue.orientation
                 const index = or === 'AC' ? startIndex + i : startIndex + i * this.width;
-                this.cells[index].value = newClue.solution[i].toLowerCase();
+                const val = item.solution[i];
+                this.cells[index].value = val;
+                newClue.cellList.push(this.cells[index]);
             }
         }
 
@@ -99,7 +107,7 @@ export class Grid {
         const clueCache = new Map();
         const wordLengthCache = new Map();
         for (let item of this.clues) {
-            const key = item.solution.join('');
+            const key = item.getCurrentSolution();
             if (!key.includes(OPEN)) {
                 clueCache.set(key, item.clue);
                 wordLengthCache.set(key, item.word_lengths);
@@ -143,7 +151,6 @@ export class Grid {
                 clue.cellList.push(this.cells[i]);
                 this.clues.push(clue);
                 this.cells[i].clueAcross = clue;
-                clue.solution[0] = this.cells[i].value;
 
             }
 
@@ -154,7 +161,6 @@ export class Grid {
                 sharedClue.len += 1;
                 sharedClue.cellList.push(this.cells[i]);
                 this.cells[i].clueAcross = sharedClue;
-                sharedClue.solution[sharedClue.len - 1] = this.cells[i].value;
             }
 
             // If cell has no top neighbour, but has a bottom neighbour, 
@@ -169,7 +175,6 @@ export class Grid {
                 clue.cellList.push(this.cells[i]);
                 this.clues.push(clue);
                 this.cells[i].clueDown = clue;
-                clue.solution[0] = this.cells[i].value;
             }
 
             // if cell has a top neighbour, it shares the same clue reference
@@ -179,7 +184,6 @@ export class Grid {
                 sharedClue.len += 1;
                 sharedClue.cellList.push(this.cells[i]);
                 this.cells[i].clueDown = sharedClue;
-                sharedClue.solution[sharedClue.len - 1] = this.cells[i].value;
             }
         }
 
@@ -257,7 +261,7 @@ export class Grid {
         // is among the keys, the solution and its cells are unchanged, and the clue and 
         // word_length can be conserved.
         for (let item of this.clues) {
-            const key = item.solution.join('');
+            const key = item.getCurrentSolution();
             if (clueCache.get(key)) {
                 item.clue = clueCache.get(key);
             }
@@ -296,10 +300,6 @@ export class Grid {
             const cellValueSpan = document.getElementById(`cellvaluespan-${index}`);
             cellValueSpan.innerText = cell.value;
 
-            // Set the character in the currentHighlightedClue
-            const solutionIndex = clue.cellList.indexOf(cell);
-            clue.solution[solutionIndex] = cell.value;
-
             // If not at end of clue, advance the currentHighlightedClue
             // to the next clue on the cellList.
             if (cellListIndex < clue.len - 1) {
@@ -322,10 +322,6 @@ export class Grid {
                 cellValueSpan.innerText = '';
                 cell.value = '';
                 cell.isOpen = true;
-
-                // Update the current clue's solution
-                const solutionIndex = clue.cellList.indexOf(cell);
-                clue.solution[solutionIndex] = '';
 
                 if (cellListIndex > 0) {
                     let cellDiv = document.getElementById(`cellDiv-${cell.index}`);
@@ -350,12 +346,6 @@ export class Grid {
                 cellValueSpan.innerText = '';
                 this.currentHighlightedCell.value = '';
                 this.currentHighlightedCell.isOpen = true;
-
-                // Update the current clue's solution
-                let cell = this.currentHighlightedCell;
-                let clue = this.currentHighlightedClue;
-                const solutionIndex = clue.cellList.indexOf(cell);
-                clue.solution[solutionIndex] = '';
             }
         }
     }
