@@ -56,10 +56,13 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
 const renderThumbnails = (json) => {
     const puzzleList = json.puzzles;
     const thumbnailHolder = document.getElementById('thumbnail-holder');
-    const hr = document.createElement('hr');
     for (let item of puzzleList) {
+
+        // Create a title each for the created and last_edited fields
         const title = document.createElement('h6');
         const lastEditedTitle = document.createElement('h6');
+        title.classList.add('text-center');
+        lastEditedTitle.classList.add('text-center');
         const createdDate = new Date(item.puzzle.created_on);
         let dayName = new Intl.DateTimeFormat("en-UK", { weekday: "short" }).format(createdDate);
         const createdDateString = dayName + " " + createdDate.toLocaleString();
@@ -68,14 +71,23 @@ const renderThumbnails = (json) => {
         const lastEditDateString = dayName + " " + lastEditDate.toLocaleString();
         title.innerText = `Created by ${item.puzzle.creator} on ${createdDateString}`;
         lastEditedTitle.innerText = `Last edited on ${lastEditDateString}`;
-        thumbnailHolder.appendChild(title);
-        thumbnailHolder.appendChild(lastEditedTitle);
+
+        // Create a bootstrap column to hold all the puzzle details
+        const col = document.createElement('div');
+        col.classList.add('col-12', 'col-md-4');
+        col.appendChild(title);
+        col.appendChild(lastEditedTitle);
+
+        // Create the grid thumbnail
         const container = createThumbnail(item.puzzle, item.clues);
         container.addEventListener('click', (e) => {
             redirectToPuzzleEditor(item.puzzle.id);
         });
+        col.appendChild(container);
+        col.appendChild(document.createElement('hr'));
+
+        thumbnailHolder.appendChild(col);
         
-        thumbnailHolder.appendChild(container);
     }
 }
 
