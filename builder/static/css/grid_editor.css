@@ -76,7 +76,6 @@ body {
 
 .highlighted-cell {
     box-sizing: border-box;
-    border : 2px solid red;
     background-color: #ffaa50 !important;
 }
 
@@ -147,7 +146,7 @@ body {
 }
 
 .virtual-key {
-    text-align: center;
+    display: inline-block;
     padding-top: 3px;
     width: 30px;
     height: 30px;
@@ -158,6 +157,10 @@ body {
     border: 1px solid darkgrey;
     text-transform: uppercase;
     margin: 2px 2px;
+}
+
+#keyboard-closer:hover {
+    cursor: pointer;
 }
 
 

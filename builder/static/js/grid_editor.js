@@ -363,7 +363,7 @@ const populateVirtualKeyboard = () => {
     for (let char of ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P']) {
         const span = document.createElement('span');
         span.innerText = char;
-        span.classList.add('virtual-key', 'text-center');
+        span.classList.add('virtual-key');
         const charCode = char === '\u21B5' ? 8 : char.charCodeAt(0);
         span.addEventListener('click', () => grid.onKeyup(charCode));
         topRow.appendChild(span);
@@ -530,6 +530,10 @@ const addEventListeners = () => {
             grid.currentHighlightedClue.word_lengths = e.target.value;
         }
     });
+
+    document.getElementById('keyboard-closer').addEventListener('click', (e) => {
+        hideKeyboard();
+    })
 }
 
 const hideKeyboard = () => {
