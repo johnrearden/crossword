@@ -5,7 +5,6 @@ import { getCellIndex } from './crossword_grid.js';
 let grid;
 let puzzleID;
 let throttled = false;
-let keyboardDisplayed = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const data = JSON.parse(document.getElementById('data').textContent);
@@ -61,6 +60,10 @@ const drawGrid = (grid) => {
 
         // Add a click listener to each cell
         cellDiv.addEventListener('click', (event) => {
+
+            // Show the keyboard, in case it has been hidden.
+            showKeyboard();
+
             const clickedCellIndex = event.target.id.split('-')[1];
             const clickedCell = cells[clickedCellIndex];
 
@@ -484,6 +487,7 @@ const addEventListeners = () => {
 
     const clueEditorButton = document.getElementById('clue-editor-button');
     clueEditorButton.addEventListener('click', (event) => {
+        hideKeyboard();
         const word = getWordFromCurrentClue();
         getDefinition(word);
     });
@@ -501,6 +505,16 @@ const addEventListeners = () => {
             grid.currentHighlightedClue.word_lengths = e.target.value;
         }
     });
+}
+
+const hideKeyboard = () => {
+    const keyboard = document.getElementById('virtual-keyboard');
+    keyboard.classList.add('d-none');
+}
+
+const showKeyboard = () => {
+    const keyboard = document.getElementById('virtual-keyboard');
+    keyboard.classList.remove('d-none');
 }
 
 
