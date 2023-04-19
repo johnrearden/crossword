@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     puzzleID = data.puzzle.id;
     drawGrid(grid);
     renderSolutions(data.clues);
+    renderClues(grid.clues);
     populateVirtualKeyboard();
 });
 
@@ -25,6 +26,23 @@ const renderSolutions = (clues) => {
             const character = clue.solution[i];
             span.innerText = character === OPEN ? '' : character;
             grid.cells[index].value = character === OPEN ? OPEN : character;
+        }
+    }
+}
+
+const renderClues = (clues) => {
+    const acrossDiv = document.getElementById('clues-across-list');
+    const downDiv = document.getElementById('clues-down-list');
+
+    for (let item of clues) {
+        const para = document.createElement('p');
+        const text = item.clue ? item.clue : 'No clue yet.';
+        para.innerText = `${item.number}: ${item.clue}`;
+        para.id = `cluepara-${item.number}-${item.orientation}`;
+        if (item.orientation === 'AC') {
+            acrossDiv.appendChild(para);
+        } else {
+            downDiv.appendChild(para);
         }
     }
 }
@@ -266,6 +284,12 @@ const displayClue = (clue) => {
     clueDisplay.innerText = clue;
 }
 
+const displayClueInClueList = (item) => {
+    const para = document.getElementById(`cluepara-${item.number}-${item.orientation}`);
+    const text = item.clue ? item.clue : 'No clue yet.';
+    para.innerText = `${item.number}: ${text}`;
+}
+
 /**
  * Builds a string from the contents of the current clue (property of the grid object).
  * 
@@ -496,6 +520,7 @@ const addEventListeners = () => {
         if (grid.currentHighlightedClue) {
             grid.currentHighlightedClue.clue = event.target.value;
             displayClue(grid.currentHighlightedClue.clue);
+            displayClueInClueList(grid.currentHighlightedClue);
         }
 
     });
