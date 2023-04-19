@@ -16,9 +16,11 @@ export class Clue {
     convertToObject() {
         const list = [];
         for (let cell of this.cellList) {
-            list.push(cell.value);
+            const char = cell.value === '' ? '#' : cell.value;
+            list.push(char);
         }
         const solution_string = list.join('');
+        console.log(`solution_string == ${solution_string}`);
         return {
             'solution': solution_string,
             'clue': this.clue,
