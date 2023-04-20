@@ -3,10 +3,13 @@ import { OPEN, CLOSED } from './crossword_grid.js';
 import { getCellIndex} from './crossword_grid.js';
 
 
+// Global state
 let grid;
 let puzzleID;
 let throttled = false;
 
+
+// Create the grid object and render it on page load.
 document.addEventListener('DOMContentLoaded', () => {
     const data = JSON.parse(document.getElementById('data').textContent);
     grid = new Grid(data.puzzle.grid, data.clues);
@@ -17,6 +20,13 @@ document.addEventListener('DOMContentLoaded', () => {
     populateVirtualKeyboard();
 });
 
+/**
+ * Renders the list of solutions from the backend onto the puzzle, and places the letter 
+ * values in the appropriate cells. The clue attribute is not set here - it is set in 
+ * the Grid object constructor.
+ * 
+ * @param {Array:Clue} clues 
+ */
 const renderSolutions = (clues) => {
     for (let clue of clues) {
         for (let i = 0; i < clue.solution.length; i++) {
@@ -31,6 +41,11 @@ const renderSolutions = (clues) => {
     }
 }
 
+/**
+ * Renders the clue strings on the page, below the main crossword puzzle display.
+ * 
+ * @param {Array:Clue} clues 
+ */
 const renderClues = (clues) => {
     const acrossDiv = document.getElementById('clues-across-list');
     const downDiv = document.getElementById('clues-down-list');
@@ -51,6 +66,15 @@ const renderClues = (clues) => {
     }
 }
 
+/**
+ * This function performs a number of tasks.
+ *      - It sets the row and column attributes of the css grid layout for the puzzle grid.
+ *      - It calls the addEventListeners function, keeping the HTML free of event handling.
+ *      - It creates the cell divs which display each cell of the puzzle, and adds 
+ *        a click listener to each, which selects the cell and the clue of which it is a part.
+ * 
+ * @param {Grid} grid 
+ */
 const drawGrid = (grid) => {
     const width = grid.width;
     const height = grid.height;
@@ -63,7 +87,9 @@ const drawGrid = (grid) => {
     setCrosswordCellWidth(grid);
     addEventListeners();
 
-    // Iterate through the grid
+    // Iterate through the grid, and create a div and 2 spans for each cell, with
+    // the appropriate css classes. The first span holds any letter entered in the cell, and
+    // the second holds any potential clue number, in superscript.
     for (let i = 0; i < cells.length; i++) {
         const cellDiv = document.createElement('div');
         const cellValueSpan = document.createElement('span');
@@ -80,7 +106,7 @@ const drawGrid = (grid) => {
         span.id = `numberspan-${i}`;
         cellDiv.appendChild(span);
 
-        // Add a click listener to each cell
+        // Add a click listener to each cell to handle cell and clue selection
         cellDiv.addEventListener('click', (event) => {
 
             // Show the keyboard, in case it has been hidden.
@@ -95,6 +121,7 @@ const drawGrid = (grid) => {
                 const cell = cells[cellIndex];
 
                 if (cell.isOpen) {
+                    // Close the cell, delete its contents
                     const div = document.getElementById(`cellDiv-${cellIndex}`);
                     div.classList.remove('open');
                     div.classList.add('blank');
@@ -103,6 +130,7 @@ const drawGrid = (grid) => {
                     span.innerText = '';
                     cell.isOpen = false;
                 } else {
+                    // Open the cell
                     const div = document.getElementById(`cellDiv-${cellIndex}`);
                     div.classList.remove('blank');
                     div.classList.add('open');
@@ -110,18 +138,18 @@ const drawGrid = (grid) => {
                 }
 
                 // Reindex the grid, clearing the clue numbers beforehand, and rendering the new ones
-                // afterwards
+                // afterwards ... at least one of the clues has changed.
                 clearExistingClueNumbers();
                 grid.reindex();
                 rerenderClueNumbers();
 
             } else if (clickedCell.isOpen) {
-                // Remove highlighting from previous cell and clue. Clear the definition and 
-                // word length inputs
+                // The user is editing the content of the cell. Remove highlighting from previous 
+                // cell and clue. Clear the definition and word length inputs
                 document.getElementById('def-input').value = '';
                 document.getElementById('word-lengths-input').value = '';
-                if (grid.currentHighlightedClue) {
 
+                if (grid.currentHighlightedClue) {
                     // If there is a clue currently highlighted, remove the highlighting from it.
                     const cells = getClueCells(grid.currentHighlightedClue, grid);
                     for (let cell of cells) {
@@ -146,7 +174,6 @@ const drawGrid = (grid) => {
                     }
                 } else {
                     currentClue = clickedCell.clueAcross || clickedCell.clueDown;
-
                 }
 
                 const cellsToHighlight = getClueCells(currentClue, grid);
@@ -155,6 +182,8 @@ const drawGrid = (grid) => {
                     const cellDiv = document.getElementById(`cellDiv-${index}`);
                     cellDiv.classList.add('highlighted-clue');
                 }
+
+                // Give the particular cell clicked a lighter emphasized highlighting.
                 const cellDiv = document.getElementById(`cellDiv-${clickedCellIndex}`);
                 cellDiv.classList.add('highlighted-cell');
                 grid.currentHighlightedClue = currentClue;
@@ -166,12 +195,17 @@ const drawGrid = (grid) => {
                 displayClue(grid.currentHighlightedClue.clue);
             }
         });
+
+        // Finally, add this cell div to the gridDiv.
         gridDiv.appendChild(cellDiv);
     }
 
     rerenderClueNumbers();
 }
 
+/**
+ * Removes the cell numbers from each cell.
+ */
 const clearExistingClueNumbers = () => {
     // Iterate through the clues, and delete any numbers in their starting cells
     for (let clue of grid.clues) {
@@ -181,7 +215,9 @@ const clearExistingClueNumbers = () => {
     }
 }
 
-
+/**
+ * Renders the clue numbers in the appropriate cell (inside a numberspan element)
+ */
 const rerenderClueNumbers = () => {
     // Iterate through the clues, and render their number in their
     // starting cells.
@@ -192,6 +228,15 @@ const rerenderClueNumbers = () => {
     }
 }
 
+/**
+ * Takes a clue and a grid as parameters, and calculates the indices of the cells
+ * that belong to the clue, depending on whether the clue orientation is across or
+ * down. It then collects these cells and returns them in a list.
+ * 
+ * @param {Clue} clue 
+ * @param {Grid} grid 
+ * @returns a list of the cells that belong to the clue supplied
+ */
 const getClueCells = (clue, grid) => {
 
     if (!clue) {
@@ -220,13 +265,21 @@ const getClueCells = (clue, grid) => {
     return cells;
 }
 
-// Check if the user has selected the layout editor checkbox on the page
+/**
+ * Check if the user has selected the layout editor checkbox on the page
+ * 
+ * @returns a boolean representing the checked state of the checkbox element
+*/ 
 const isEditingLayout = () => {
     const checkbox = document.getElementById('layout-editor-checkbox');
     return checkbox.checked;
 }
 
-// Remove selection highlighting from the current clue
+/**
+ * Remove selection highlighting from the current clue
+ * 
+ * @param {Event} event not used
+ */
 const unSelectCurrentClue = (event) => {
     if (!grid.currentHighlightedClue) {
         return;
