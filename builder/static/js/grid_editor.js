@@ -468,8 +468,9 @@ const addEventListeners = () => {
             if (cell.clueAcross && cell.clueDown) {
                 const intersector = thisClue.orientation === "AC" ? cell.clueDown : cell.clueAcross;
                 let allCellsFilled = true;
+                
                 for (let c of intersector.cellList) {
-                    if (c.value == '') {
+                    if (c.value === '' || c.value === OPEN) {
                         allCellsFilled = false;
                     }
                 }
