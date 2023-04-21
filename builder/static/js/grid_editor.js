@@ -1,6 +1,6 @@
 import { Grid } from './crossword_grid.js';
-import { OPEN, CLOSED } from './crossword_grid.js';
-import { getCellIndex} from './crossword_grid.js';
+import { OPEN, START, MIDDLE, END, NONE } from './crossword_grid.js';
+import { getCellIndex } from './crossword_grid.js';
 
 
 // Global state
@@ -59,7 +59,6 @@ const renderClues = (clues) => {
             array.push(cell.value);
         }
         const solutionString = array.join('');
-        console.log('solutionString : ' + solutionString);
         const para = document.createElement('p');
         const text = item.clue ? `${solutionString.toUpperCase()} - ${item.clue}` : '...';
         para.innerText = `${item.number}: ${text}`;
@@ -280,7 +279,7 @@ const getClueCells = (clue, grid) => {
  * Check if the user has selected the layout editor checkbox on the page
  * 
  * @returns a boolean representing the checked state of the checkbox element
-*/ 
+*/
 const isEditingLayout = () => {
     const checkbox = document.getElementById('layout-editor-checkbox');
     return checkbox.checked;
@@ -479,7 +478,7 @@ const addEventListeners = () => {
             if (cell.clueAcross && cell.clueDown) {
                 const intersector = thisClue.orientation === "AC" ? cell.clueDown : cell.clueAcross;
                 let allCellsFilled = true;
-                
+
                 for (let c of intersector.cellList) {
                     if (c.value === '' || c.value === OPEN) {
                         allCellsFilled = false;
@@ -512,10 +511,26 @@ const addEventListeners = () => {
                 const results = json.results;
                 const count = results.length;
                 document.getElementById('matches-modal-title').innerText = `Matches (${count})`;
+                const clue = grid.currentHighlightedClue;
                 for (let item of results) {
+                    const array = []
                     const span = document.createElement('span');
+                    for (let i = 0; i < item.length; i++) {
+                        const char = item[i];
+                        if (clue.orthogs[i] === START) {
+                            array.push(`<span class="text-green"><strong>${char}</strong></span>`);
+                        } else if (clue.orthogs[i] === MIDDLE) {
+                            array.push(`<span class="text-blue"><strong>${char}</strong></span>`);
+                        } else if (clue.orthogs[i] === END) {
+                            array.push(`<span class="text-red"><strong>${char}</strong></span>`);
+                        } else {
+                            array.push(char);
+                        }
+                    }
+                    span.innerHTML = array.join('');
+                    console.log(array.join(''));
+                    console.log(span.innerHTML);
                     span.classList.add('match-word');
-                    span.innerText = item;
                     span.addEventListener('click', (event) => {
                         replaceCurrentClue(item);
                         const modalDiv = document.getElementById('matches-modal');

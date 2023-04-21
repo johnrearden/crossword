@@ -16,6 +16,18 @@ body {
     background-color: #cccccc;
 }
 
+.text-red {
+    color: red;
+}
+
+.text-green {
+    color: green;
+}
+
+.text-blue {
+    color: blue;
+}
+
 #grid-editor-div {
     justify-content: center;
     display: grid;
@@ -109,6 +121,7 @@ body {
 .match-word {
     display: inline-block;
     cursor: pointer;
+    font-size: 1.2rem;
     padding: 2px 5px;
     margin: 3px;
     background-color: #eeeeee;
@@ -162,6 +175,8 @@ body {
 #keyboard-closer:hover {
     cursor: pointer;
 }
+
+
 
 
 /* These elements style the builder_home page */

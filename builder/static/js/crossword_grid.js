@@ -1,10 +1,15 @@
 export const OPEN = '#';
 export const CLOSED = '-';
+export const START = "S";
+export const MIDDLE = "M";
+export const END = "E";
+export const NONE = "-";
 
 export class Clue {
     constructor(startRow, startCol, orientation) {
         this.clue = '';
         this.cellList = [];
+        this.orthogs = [];
         this.word_lengths = '';
         this.orientation = orientation;
         this.startRow = startRow;
@@ -140,6 +145,7 @@ export class Grid {
             const hasRight = hasRightNeighbour(this.cells[i], this);
             const hasTop = hasTopNeighbour(this.cells[i], this);
             const hasBottom = hasBottomNeighbour(this.cells[i], this);
+            let orthogType = NONE;
 
             // If cell has no left neighbour, but has a right neighbour, 
             // it starts an AC clue. Create an AC clue, and place a reference
@@ -154,6 +160,11 @@ export class Grid {
                 this.clues.push(clue);
                 this.cells[i].clueAcross = clue;
 
+                // Check the orthogType
+                if (hasTop && !hasBottom) orthogType = END;
+                if (!hasTop && hasBottom) orthogType = START;
+                if (hasTop && hasBottom) orthogType = MIDDLE;
+                clue.orthogs.push(orthogType);
             }
 
             // If cell has a left neighbour, it shares the same clue reference.
@@ -163,6 +174,12 @@ export class Grid {
                 sharedClue.len += 1;
                 sharedClue.cellList.push(this.cells[i]);
                 this.cells[i].clueAcross = sharedClue;
+
+                // Check the orthogType
+                if (hasTop && !hasBottom) orthogType = END;
+                if (!hasTop && hasBottom) orthogType = START;
+                if (hasTop && hasBottom) orthogType = MIDDLE;
+                sharedClue.orthogs.push(orthogType);
             }
 
             // If cell has no top neighbour, but has a bottom neighbour, 
@@ -177,6 +194,12 @@ export class Grid {
                 clue.cellList.push(this.cells[i]);
                 this.clues.push(clue);
                 this.cells[i].clueDown = clue;
+
+                // Check the orthogType
+                if (hasLeft && !hasRight) orthogType = END;
+                if (!hasLeft && hasRight) orthogType = START;
+                if (hasLeft && hasRight) orthogType = MIDDLE;
+                clue.orthogs.push(orthogType);
             }
 
             // if cell has a top neighbour, it shares the same clue reference
@@ -186,6 +209,12 @@ export class Grid {
                 sharedClue.len += 1;
                 sharedClue.cellList.push(this.cells[i]);
                 this.cells[i].clueDown = sharedClue;
+
+                // Check the orthogType
+                if (hasLeft && !hasRight) orthogType = END;
+                if (!hasLeft && hasRight) orthogType = START;
+                if (hasLeft && hasRight) orthogType = MIDDLE;
+                sharedClue.orthogs.push(orthogType);
             }
         }
 
