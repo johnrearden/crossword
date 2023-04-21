@@ -49,10 +49,19 @@ const renderSolutions = (clues) => {
 const renderClues = (clues) => {
     const acrossDiv = document.getElementById('clues-across-list');
     const downDiv = document.getElementById('clues-down-list');
+    acrossDiv.innerText = '';
+    downDiv.innerText = '';
 
     for (let item of clues) {
+        // Create a string representing the solution
+        const array = []
+        for (let cell of item.cellList) {
+            array.push(cell.value);
+        }
+        const solutionString = array.join('');
+        console.log('solutionString : ' + solutionString);
         const para = document.createElement('p');
-        const text = item.clue ? item.clue : 'No clue yet.';
+        const text = item.clue ? `${solutionString.toUpperCase()} - ${item.clue}` : '...';
         para.innerText = `${item.number}: ${text}`;
         para.id = `cluepara-${item.number}-${item.orientation}`;
         if (!item.clue) {
@@ -138,10 +147,12 @@ const drawGrid = (grid) => {
                 }
 
                 // Reindex the grid, clearing the clue numbers beforehand, and rendering the new ones
-                // afterwards ... at least one of the clues has changed.
+                // afterwards ... at least one of the clues has changed. Also rerender the clues in 
+                // the clue list.
                 clearExistingClueNumbers();
                 grid.reindex();
                 rerenderClueNumbers();
+                renderClues(grid.clues);
 
             } else if (clickedCell.isOpen) {
                 // The user is editing the content of the cell. Remove highlighting from previous 
