@@ -25,7 +25,6 @@ export class Clue {
             list.push(char);
         }
         const solution_string = list.join('');
-        console.log(`solution_string == ${solution_string}`);
         return {
             'solution': solution_string,
             'clue': this.clue,

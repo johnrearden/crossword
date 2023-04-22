@@ -16,15 +16,15 @@ body {
     background-color: #cccccc;
 }
 
-.text-red {
+.text-end {
     color: red;
 }
 
-.text-green {
-    color: green;
+.text-start {
+    color: rgb(118, 1, 114);
 }
 
-.text-blue {
+.text-middle {
     color: blue;
 }
 

@@ -502,7 +502,6 @@ const addEventListeners = () => {
 
         // Show the word matches modal
         const queryString = getWordFromCurrentClue();
-        console.log(`queryString is '${queryString}`);
         const url = `/builder/query/${queryString}`;
         const matchesDiv = document.getElementById('matches-div');
         matchesDiv.textContent = '';
@@ -518,18 +517,16 @@ const addEventListeners = () => {
                     for (let i = 0; i < item.length; i++) {
                         const char = item[i];
                         if (clue.orthogs[i] === START) {
-                            array.push(`<span class="text-green"><strong>${char}</strong></span>`);
+                            array.push(`<span class="text-start"><strong>${char}</strong></span>`);
                         } else if (clue.orthogs[i] === MIDDLE) {
-                            array.push(`<span class="text-blue"><strong>${char}</strong></span>`);
+                            array.push(`<span class="text-middle"><strong>${char}</strong></span>`);
                         } else if (clue.orthogs[i] === END) {
-                            array.push(`<span class="text-red"><strong>${char}</strong></span>`);
+                            array.push(`<span class="text-end"><strong>${char}</strong></span>`);
                         } else {
                             array.push(char);
                         }
                     }
                     span.innerHTML = array.join('');
-                    console.log(array.join(''));
-                    console.log(span.innerHTML);
                     span.classList.add('match-word');
                     span.addEventListener('click', (event) => {
                         replaceCurrentClue(item);
@@ -568,7 +565,6 @@ const addEventListeners = () => {
             .then(json => {
                 alert('Crossword saved successfully');
                 puzzleID = json.puzzle_id;
-                console.log(`Puzzle id is now ${puzzleID}`);
             });
     });
 
