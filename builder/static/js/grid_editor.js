@@ -507,7 +507,7 @@ const addEventListeners = () => {
         matchesDiv.textContent = '';
         fetch(url).then(response => response.json())
             .then(json => {
-                const results = json.results;
+                const results = json.results.slice(0, 100);
                 const count = results.length;
                 document.getElementById('matches-modal-title').innerText = `Matches (${count})`;
                 const clue = grid.currentHighlightedClue;
