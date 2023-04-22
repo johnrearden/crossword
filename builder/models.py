@@ -30,8 +30,8 @@ class CrosswordPuzzle(models.Model):
     """
     A puzzle consists of a grid, with related puzzle words.
     """
-    grid = models.ForeignKey(Grid, on_delete=models.CASCADE,
-                             related_name='puzzles')
+    grid = models.OneToOneField(Grid, on_delete=models.CASCADE,
+                                related_name='puzzles')
     created_on = models.DateTimeField(auto_now_add=True)
     last_edited = models.DateTimeField(auto_now=True)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
