@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
     'crispy_forms',
     'builder',
-    'solver',
+    'crossword_client_api',
     'welcome',
 ]
 

@@ -20,5 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('builder/', include('builder.urls')),
+    path('api/v1/crossword/', include('crossword_client_api.urls')),
     path('', include('welcome.urls')),
 ]
