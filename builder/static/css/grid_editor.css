@@ -22,7 +22,7 @@ body {
 }
 
 .text-start {
-    color: rgb(118, 1, 114);
+    color: rgb(185, 2, 139);
 }
 
 .text-middle {
@@ -121,6 +121,7 @@ body {
 
 .match-word {
     display: inline-block;
+    font-family: monospace;
     cursor: pointer;
     font-size: 1.2rem;
     padding: 2px 5px;
@@ -128,6 +129,11 @@ body {
     background-color: #eeeeee;
     border: 1px solid lightgrey;
     border-radius: 5px;
+}
+
+.match-letter {
+    font-family: inherit;
+    font-size: inherit;
 }
 
 .match-word:hover {

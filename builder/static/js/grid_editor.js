@@ -517,17 +517,18 @@ const addEventListeners = () => {
                     for (let i = 0; i < item.length; i++) {
                         const char = item[i];
                         if (clue.orthogs[i] === START) {
-                            array.push(`<span class="text-start"><strong>${char}</strong></span>`);
+                            array.push(`<span class="text-start match-letter">${char}</span>`);
                         } else if (clue.orthogs[i] === MIDDLE) {
-                            array.push(`<span class="text-middle"><strong>${char}</strong></span>`);
+                            array.push(`<span class="text-middle match-letter">${char}</span>`);
                         } else if (clue.orthogs[i] === END) {
-                            array.push(`<span class="text-end"><strong>${char}</strong></span>`);
+                            array.push(`<span class="text-end match-letter">${char}</span>`);
                         } else {
                             array.push(char);
                         }
                     }
-                    span.innerHTML = array.join('');
                     span.classList.add('match-word');
+                    span.innerHTML = array.join('');
+                    
                     span.addEventListener('click', (event) => {
                         replaceCurrentClue(item);
                         const modalDiv = document.getElementById('matches-modal');
