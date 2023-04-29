@@ -1,7 +1,7 @@
 import { OPEN, CLOSED } from './crossword_grid.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const url = '/api/v1/builder/get_recent_puzzles/10/';
+    const url = 'get_recent_puzzles/10/';
     fetch(url).then(response => response.json())
         .then(json => renderThumbnails(json))
 });
@@ -30,7 +30,7 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
 
     // Post the new puzzle data to the backend, and then redirect the user
     // to the puzzle editor using the new puzzle id returned in the response.
-    const url = "/api/v1/builder/create_new_puzzle/";
+    const url = "builder/create_new_puzzle/";
     const payload = JSON.stringify({
         'width': cols,
         'height': rows,

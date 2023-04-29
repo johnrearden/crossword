@@ -502,7 +502,7 @@ const addEventListeners = () => {
 
         // Show the word matches modal
         const queryString = getWordFromCurrentClue();
-        const url = `/api/v1/builder/query/${queryString}`;
+        const url = `/builder/query/${queryString}`;
         const matchesDiv = document.getElementById('matches-div');
         matchesDiv.textContent = '';
         fetch(url).then(response => response.json())
@@ -551,7 +551,7 @@ const addEventListeners = () => {
             'clues': list,
             'grid': gridString,
         });
-        const url = '/api/v1/builder/save_puzzle/';
+        const url = '/builder/save_puzzle/';
         const options = {
             method: 'POST',
             body: payload,
