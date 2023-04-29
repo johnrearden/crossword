@@ -44,6 +44,11 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Add Referrer-Policy Header
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
+# CORS allowed domains
+CORS_ALLOWED_ORIGINS = [
+    'https://fruzzled.ie', 'https://www.fruzzled.ie'
+]
+
 
 # Application definition
 
@@ -54,6 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'allauth',
     'allauth.account',
@@ -67,6 +73,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
