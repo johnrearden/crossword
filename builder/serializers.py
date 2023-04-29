@@ -11,8 +11,8 @@ class GridSerializer(serializers.ModelSerializer):
 class CrosswordClueSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrosswordClue
-        fields = ['clue', 'solution', 'word_lengths', 'orientation',
-                  'start_col', 'start_row', ]
+        fields = ['id', 'clue', 'solution', 'word_lengths', 'orientation',
+                  'start_col', 'start_row', 'clue_number']
 
 
 class CrosswordPuzzleSerializer(serializers.ModelSerializer):
