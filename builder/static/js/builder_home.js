@@ -30,7 +30,7 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
 
     // Post the new puzzle data to the backend, and then redirect the user
     // to the puzzle editor using the new puzzle id returned in the response.
-    const url = "builder/create_new_puzzle/";
+    const url = "create_new_puzzle/";
     const payload = JSON.stringify({
         'width': cols,
         'height': rows,
