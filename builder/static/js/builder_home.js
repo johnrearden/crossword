@@ -1,7 +1,7 @@
 import { OPEN, CLOSED } from './crossword_grid.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const url = '/builder/get_recent_puzzles/10/';
+    const url = '/api/v1/builder/get_recent_puzzles/10/';
     fetch(url).then(response => response.json())
         .then(json => renderThumbnails(json))
 });
@@ -30,7 +30,7 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
 
     // Post the new puzzle data to the backend, and then redirect the user
     // to the puzzle editor using the new puzzle id returned in the response.
-    const url = "/builder/create_new_puzzle/";
+    const url = "/api/v1/builder/create_new_puzzle/";
     const payload = JSON.stringify({
         'width': cols,
         'height': rows,
@@ -48,7 +48,7 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
     fetch(url, options)
         .then(response => response.json())
         .then(json => {
-            window.location = `/builder/puzzle_editor/${json.new_puzzle_id}`;
+            window.location = `puzzle_editor/${json.new_puzzle_id}`;
         });
 });
 
@@ -92,7 +92,7 @@ const renderThumbnails = (json) => {
 }
 
 const redirectToPuzzleEditor = (puzzleId) => {
-    window.location = `/builder/puzzle_editor/${puzzleId}`;
+    window.location = `puzzle_editor/${puzzleId}`;
 }
 
 const createThumbnail = (puzzle, clues) => {
