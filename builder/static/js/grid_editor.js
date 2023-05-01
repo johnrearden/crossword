@@ -65,6 +65,8 @@ const renderClues = (clues) => {
         para.id = `cluepara-${item.number}-${item.orientation}`;
         if (!item.clue) {
             para.classList.add('text-muted');
+        } else {
+            para.classList.add('text-black');
         }
         if (item.orientation === 'AC') {
             acrossDiv.appendChild(para);
@@ -551,11 +553,11 @@ const addEventListeners = () => {
                     for (let i = 0; i < item.length; i++) {
                         const char = item[i];
                         if (clue.orthogs[i] === START) {
-                            array.push(`<span class="text-start match-letter">${char}</span>`);
+                            array.push(`<span class="letter-start match-letter">${char}</span>`);
                         } else if (clue.orthogs[i] === MIDDLE) {
-                            array.push(`<span class="text-middle match-letter">${char}</span>`);
+                            array.push(`<span class="letter-middle match-letter">${char}</span>`);
                         } else if (clue.orthogs[i] === END) {
-                            array.push(`<span class="text-end match-letter">${char}</span>`);
+                            array.push(`<span class="letter-end match-letter">${char}</span>`);
                         } else {
                             array.push(char);
                         }
@@ -626,6 +628,12 @@ const addEventListeners = () => {
 
     document.getElementById('clue-editor-modal').addEventListener('shown.bs.modal', () => {
         document.getElementById('def-input').focus();
+    });
+
+    document.getElementById('copy-word-button').addEventListener('click', (event) => {
+        const word = getWordFromCurrentClue();
+        navigator.clipboard.writeText(word)
+                 .then(() => console.log('current word copied to clipboard'));
     });
 }
 
