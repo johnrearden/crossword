@@ -12,16 +12,25 @@
         <span>Crossword saved</span>
     </div>
 
-    <div class="row mt-4 justify-content-center">
-        <div class="col">
-            <label for="layout-editor-checkbox">Edit Layout</label>
-            <input type="checkbox" id="layout-editor-checkbox">
+    <div class="row mt-4 justify-content-center align-items-center">
+        <div class="col form-check form-switch border border-1 rounded d-flex align-items-center justify-content-center">
+            <div class="my-auto">
+                <label for="layout-editor-checkbox">
+                    Layout
+                </label>
+                <input type="checkbox" id="layout-editor-checkbox" class="form-check-input" role="switch">
+            </div>
+
         </div>
         <div class="col">
-            <button id="save-button">Save</button>
+            <button id="save-button" class="letter-button">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+            </button>
         </div>
         <div class="col">
-            <a href="/api/builder/">Home</a>
+            <a href="/api/builder/" class="btn letter-button">
+                <i class="fa-solid fa-house"></i>
+            </a>
         </div>
     </div>
 
@@ -35,14 +44,19 @@
         <div id="current-item-holder" class="col-12 col-md-6 text-center">
             <div class="row mt-3 align-items-center">
                 <div class="col">
-                    <button id="clue-editor-button" class="letter-button" data-bs-toggle="modal" data-bs-target="#clue-editor-modal">
-                        Clue
+                    <button id="clue-editor-button" class="letter-button" data-bs-toggle="modal"
+                        data-bs-target="#clue-editor-modal">
+                        <i class="fa-solid fa-circle-question"></i>
                     </button>
-                    <button id="matches-button" class="letter-button mx-3" data-bs-toggle="modal" data-bs-target="#matches-modal">
-                        Match
+                    <button id="matches-button" class="letter-button" data-bs-toggle="modal"
+                        data-bs-target="#matches-modal">
+                        <i class="fa-solid fa-puzzle-piece"></i>
                     </button>
                     <button id="clear-clue-button" class="letter-button">
-                        Delete
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <button id="copy-word-button" class="letter-button">
+                        <i class="fa-regular fa-copy"></i>
                     </button>
                 </div>
             </div>
@@ -74,7 +88,7 @@
 <!-- Virtual keyboard, appears only when a cell-group is selected, dismissed when modals opened-->
 <div id="virtual-keyboard" class="container-fluid d-md-none py-1">
     <div class="row justify-content-center"></div>
-        <div class="col text-center" id="vk-top-row"></div>
+    <div class="col text-center" id="vk-top-row"></div>
     <div class="row justify-content-center">
         <div class="col text-center" id="vk-middle-row"></div>
     </div>
@@ -117,12 +131,7 @@
             </div>
             <div class="modal-footer">
 
-                <button 
-                    type="button" 
-                    id="close-and-save-button"
-                    class="btn btn-secondary" 
-                    data-bs-dismiss="modal"
-                >
+                <button type="button" id="close-and-save-button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Close & Save
                 </button>
             </div>
