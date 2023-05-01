@@ -449,6 +449,40 @@ const populateVirtualKeyboard = () => {
     }
 }
 
+const saveCurrentPuzzle = () => {
+    console.log('saving puzzle');
+    const list = [];
+    for (let clue of grid.clues) {
+        list.push(clue.convertToObject());
+    }
+    const gridString = grid.getGridObject();
+    const payload = JSON.stringify({
+        'puzzle_id': puzzleID,
+        'clues': list,
+        'grid': gridString,
+    });
+    const url = '/api/builder/save_puzzle/';
+    const options = {
+        method: 'POST',
+        body: payload,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    }
+    fetch(url, options)
+        .then(response => response.json())
+        .then(json => {
+            puzzleID = json.puzzle_id;
+            const saveNotifier = document.getElementById('save-notifier');
+            saveNotifier.classList.remove('d-none');
+            setTimeout(() => {
+                saveNotifier.classList.add('d-none');
+            }, 1000);
+        });
+}
+
 const addEventListeners = () => {
     document.addEventListener('keyup', (event) => {
         if (document.activeElement === document.getElementById('def-input')) {
@@ -540,33 +574,8 @@ const addEventListeners = () => {
             });
     });
 
-    document.getElementById('save-button').addEventListener('click', (event) => {
-        const list = [];
-        for (let clue of grid.clues) {
-            list.push(clue.convertToObject());
-        }
-        const gridString = grid.getGridObject();
-        const payload = JSON.stringify({
-            'puzzle_id': puzzleID,
-            'clues': list,
-            'grid': gridString,
-        });
-        const url = '/api/builder/save_puzzle/';
-        const options = {
-            method: 'POST',
-            body: payload,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            }
-        }
-        fetch(url, options)
-            .then(response => response.json())
-            .then(json => {
-                alert('Crossword saved successfully');
-                puzzleID = json.puzzle_id;
-            });
+    document.getElementById('save-button').addEventListener('click', async (event) => {
+        saveCurrentPuzzle();
     });
 
     document.getElementById('layout-editor-checkbox').addEventListener('change', (event) => {
@@ -599,7 +608,10 @@ const addEventListeners = () => {
             displayClue(grid.currentHighlightedClue.clue);
             displayClueInClueList(grid.currentHighlightedClue);
         }
+    });
 
+    document.getElementById('close-and-save-button').addEventListener('click', (event) => {
+        saveCurrentPuzzle();
     });
 
     document.getElementById('word-lengths-input').addEventListener('input', (e) => {
@@ -611,6 +623,10 @@ const addEventListeners = () => {
     document.getElementById('keyboard-closer').addEventListener('click', (e) => {
         hideKeyboard();
     })
+
+    document.getElementById('clue-editor-modal').addEventListener('shown.bs.modal', () => {
+        document.getElementById('def-input').focus();
+    });
 }
 
 const hideKeyboard = () => {
@@ -622,6 +638,8 @@ const showKeyboard = () => {
     const keyboard = document.getElementById('virtual-keyboard');
     keyboard.classList.remove('d-none');
 }
+
+
 
 
 

@@ -183,7 +183,19 @@ body {
     cursor: pointer;
 }
 
-
+.self-dismissing-message-holder {
+    background-color: rgb(1, 1, 128);
+    color: white;
+    border-radius: 10px;
+    border: 1px solid gray;
+    position: fixed;
+    top: 25%;
+    left: 25%;
+    margin: 0 auto;
+    z-index: 9999;
+    width: 50%;
+    padding: 10px;
+}
 
 
 /* These elements style the builder_home page */

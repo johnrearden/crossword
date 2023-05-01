@@ -8,6 +8,10 @@
 {% block content %}
 <div class="container-fluid text-center">
 
+    <div id="save-notifier" class="self-dismissing-message-holder d-none">
+        <span>Crossword saved</span>
+    </div>
+
     <div class="row mt-4 justify-content-center">
         <div class="col">
             <label for="layout-editor-checkbox">Edit Layout</label>
@@ -113,11 +117,20 @@
             </div>
             <div class="modal-footer">
 
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button 
+                    type="button" 
+                    id="close-and-save-button"
+                    class="btn btn-secondary" 
+                    data-bs-dismiss="modal"
+                >
+                    Close & Save
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+
 
 {% endblock %}
 
