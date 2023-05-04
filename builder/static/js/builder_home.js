@@ -58,6 +58,8 @@ const renderThumbnails = (json) => {
     const thumbnailHolder = document.getElementById('thumbnail-holder');
     for (let item of puzzleList) {
 
+        console.log(item);
+
         // Create a title each for the created and last_edited fields
         const title = document.createElement('h6');
         const lastEditedTitle = document.createElement('h6');
@@ -72,11 +74,47 @@ const renderThumbnails = (json) => {
         title.innerText = `Created by ${item.puzzle.creator} on ${createdDateString}`;
         lastEditedTitle.innerText = `Last edited on ${lastEditDateString}`;
 
+        // Create a span for the cell_concentration
+        const cellConcSpan = document.createElement('span');
+        cellConcSpan.textContent = `Cells : ${item.cell_concentration}%`;
+        cellConcSpan.classList.add('mx-3');
+
+        // Create a span for the clues present value
+        const cluesPresentSpan = document.createElement('span');
+        cluesPresentSpan.textContent = `Clues : ${item.clues_present}/${item.total_clues}`;
+        cluesPresentSpan.classList.add('mx-3');
+
+        // Create a span for the solutions present value
+        const solutionsPresentSpan = document.createElement('span');
+        solutionsPresentSpan.textContent = `Solutions : ${item.solutions_present}/${item.total_clues}`;
+        solutionsPresentSpan.classList.add('mx-3');
+
+        // Create a button to delete the puzzle
+        const deleteButton = document.createElement('button');
+        deleteButton.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+        deleteButton.classList.add('btn', 'btn-danger', 'm-2');
+        deleteButton.addEventListener('click', () => {
+            if (confirm('Sure you want to delete it?')) {
+                deletePuzzle(item.puzzle.id);
+            };
+        })
+
+        // Create a button to mark the puzzle completed
+        const completedButton = document.createElement('button');
+        completedButton.innerHTML = '<i class="fa-solid fa-flag-checkered"></i>';
+        completedButton.classList.add('btn', 'btn-success', 'm-2');
+        completedButton.addEventListener('click', () => {
+            markPuzzleCompleted(item.puzzle.id);
+        });
+
         // Create a bootstrap column to hold all the puzzle details
         const col = document.createElement('div');
-        col.classList.add('col-12', 'col-md-4');
+        col.classList.add('col-12', 'col-md-4', 'text-center');
         col.appendChild(title);
         col.appendChild(lastEditedTitle);
+        col.appendChild(cluesPresentSpan);
+        col.appendChild(solutionsPresentSpan);
+        col.appendChild(cellConcSpan);
 
         // Create the grid thumbnail
         const container = createThumbnail(item.puzzle, item.clues);
@@ -84,6 +122,8 @@ const renderThumbnails = (json) => {
             redirectToPuzzleEditor(item.puzzle.id);
         });
         col.appendChild(container);
+        col.appendChild(deleteButton);
+        col.appendChild(completedButton);
         col.appendChild(document.createElement('hr'));
 
         thumbnailHolder.appendChild(col);
@@ -135,6 +175,34 @@ const createThumbnail = (puzzle, clues) => {
     }
 
     return container;
+}
+
+const deletePuzzle = (id) => {
+    const payload = JSON.stringify({
+        'puzzle_id': id,
+    });
+    console.log(`deleting puzzle ${id}`);
+    const url = '/api/builder/delete_puzzle/';
+    const options = {
+        method: 'POST',
+        body: payload,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    }
+    fetch(url, options)
+        .then(response => response.json())
+        .then(json => {
+            console.log(json);
+            location.reload();
+            return false;
+        });
+}
+
+const markPuzzleCompleted = (id) => {
+    console.log('todo');
 }
 
 /**

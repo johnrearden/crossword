@@ -50,6 +50,17 @@ CORS_ALLOWED_ORIGINS = [
     'https://fruzzled.ie', 'https://www.fruzzled.ie'
 ]
 
+# REST FRAMEWORK CONFIGURATION
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES':
+        ['dj_rest_auth.jwt_auth.JWTCookieAuthentication'],
+}
+REST_USE_JWT = True
+JWT_AUTH_SECURE = True
+JWT_AUTH_COOKIE = 'my-app-auth'
+JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+JWT_AUTH_SAMESITE = 'None'
+
 
 # Application definition
 
@@ -62,11 +73,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'rest_framework.authtoken',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
+    'dj_rest_auth',
     'crispy_forms',
     'builder',
     'crossword_client_api',

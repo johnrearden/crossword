@@ -8,6 +8,7 @@ from .models import DictionaryWord, DictionaryDefinition, Grid
 from .models import CrosswordPuzzle, CrosswordClue
 from .serializers import GridSerializer, CrosswordPuzzleSerializer, \
                          CrosswordClueSerializer
+from .utils import get_cell_concentration
 
 
 class BuilderHome(UserPassesTestMixin, View):
@@ -81,6 +82,16 @@ class GetGrid(APIView):
         return Response(serializer.data)
 
 
+class DeletePuzzle(UserPassesTestMixin, APIView):
+    def post(self, request):
+        id = request.data['puzzle_id']
+        CrosswordPuzzle.objects.get(pk=id).delete()
+        return JsonResponse({'message': 'fine'})
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
 class SavePuzzle(UserPassesTestMixin, APIView):
     def post(self, request, *args, **kwargs):
         clues_data = request.data['clues']
@@ -142,12 +153,32 @@ class GetRecentPuzzles(UserPassesTestMixin, APIView):
                                  .order_by('-last_edited')[:puzzle_count]
         puzzle_list = []
         for puzzle in puzzles:
+            cell_concentration = get_cell_concentration(puzzle)
+
+            # Retrieve the clues for this crossword, and count the
+            # number of them that have a non-empty clue string. Also count the
+            # number of them that have a complete solution
             clues = CrosswordClue.objects.filter(puzzle=puzzle)
+            if not clues:
+                clue_count = 0
+                solution_count = 0
+            else:
+                clue_count = 0
+                solution_count = 0
+                for clue in clues:
+                    if len(clue.clue) > 0:
+                        clue_count += 1
+                    if '#' not in clue.solution:
+                        solution_count += 1
             puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
             clue_serialzer = CrosswordClueSerializer(clues, many=True)
             data = {
                 'puzzle': puzzle_serializer.data,
                 'clues': clue_serialzer.data,
+                'cell_concentration': cell_concentration,
+                'clues_present': clue_count,
+                'solutions_present': solution_count,
+                'total_clues': len(clues)
             }
             puzzle_list.append(data)
 
