@@ -51,15 +51,17 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # REST FRAMEWORK CONFIGURATION
-""" REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':
-        ['dj_rest_auth.jwt_auth.JWTCookieAuthentication'],
-} """
-""" REST_USE_JWT = True
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    ]
+}
+REST_USE_JWT = True
 JWT_AUTH_SECURE = True
 JWT_AUTH_COOKIE = 'my-app-auth'
 JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
-JWT_AUTH_SAMESITE = 'None' """
+JWT_AUTH_SAMESITE = 'None'
 
 
 # Application definition
