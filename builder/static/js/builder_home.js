@@ -2,7 +2,7 @@ import { OPEN, CLOSED } from './crossword_grid.js';
 import { getCookie } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const url = 'get_recent_puzzles/10/';
+    const url = 'get_recent_puzzles/20/';
     fetch(url).then(response => response.json())
         .then(json => renderThumbnails(json))
 });
