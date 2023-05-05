@@ -1,4 +1,5 @@
 import { OPEN, CLOSED } from './crossword_grid.js';
+import { getCookie } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const url = 'get_recent_puzzles/10/';
@@ -204,24 +205,3 @@ const deletePuzzle = (id) => {
 const markPuzzleCompleted = (id) => {
     console.log('todo');
 }
-
-/**
- * Retrieves the document crsf cookie and returns it.
- * @param {String} name 
- * @returns the cookie value.
- */
-const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-};

@@ -95,6 +95,8 @@ class DeletePuzzle(UserPassesTestMixin, APIView):
 class SavePuzzle(UserPassesTestMixin, APIView):
     def post(self, request, *args, **kwargs):
         clues_data = request.data['clues']
+        print(f'user is : {request.user}')
+        print(f'request: {request.data}')
         if request.data['puzzle_id']:
 
             # Update the puzzle grid's cells field
