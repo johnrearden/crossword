@@ -1,3 +1,34 @@
+# Database
+
+-   The database server used both in dev and production is postgres. To log on
+to the server postgres instance, run the command, entering the password at the prompt.
+
+`psql -h localhost -U architect -d crosswordbackend`
+
+- To run a local backup of the db contents, use the pg_dump command as follows
+
+`pg_dump -h localhost -p 5432 -U architect crosswordbackend > ~/db_bckup/db.bckup`
+
+# Running nextjs app with pm2
+## PM2 setup
+
+run `sudo npm install -g pm2`
+
+Build the app.
+
+Start the process - `pm2 start "npm start"`
+
+Check that the server is running - `curl localhost:3000`
+
+Point the nginx config file to the server 
+
+`location / {`<br>
+    `proxy_pass http://localhost:3000;`<br>
+`}`
+## Automating with systemd :
+run `pm2 startup systemd`, which will generate a command to run pm2 on startup under systemd.
+Simple, in fairness.
+
 # Deployment
 
 # Real Python Tutorial

@@ -373,7 +373,6 @@ const getWordFromCurrentClue = () => {
     return result || '';
 }
 
-
 // Recalculate the cell size if the window is resized. Throttle to prevent
 // janky over-adjusting.
 window.addEventListener('resize', (event) => {

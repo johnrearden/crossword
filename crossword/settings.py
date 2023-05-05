@@ -143,6 +143,7 @@ DATABASES = {
         'PASSWORD': os.environ['DATABASE_PASSWORD'],
         'HOST': 'localhost',
         'PORT': 5432,
+        'ATOMIC_REQUESTS': True,
     }
 }
 

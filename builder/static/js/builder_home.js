@@ -62,28 +62,20 @@ const renderThumbnails = (json) => {
         console.log(item);
 
         // Create a title each for the created and last_edited fields
-        const title = document.createElement('h6');
         const lastEditedTitle = document.createElement('h6');
-        title.classList.add('text-center');
         lastEditedTitle.classList.add('text-center');
-        const createdDate = new Date(item.puzzle.created_on);
-        let dayName = new Intl.DateTimeFormat("en-UK", { weekday: "short" }).format(createdDate);
-        const createdDateString = dayName + " " + createdDate.toLocaleString();
         const lastEditDate = new Date(item.puzzle.last_edited);
-        dayName = new Intl.DateTimeFormat("en-UK", { weekday: "short" }).format(lastEditDate);
+        const dayName = new Intl.DateTimeFormat("en-UK", { weekday: "short" }).format(lastEditDate);
         const lastEditDateString = dayName + " " + lastEditDate.toLocaleString();
-        title.innerText = `Created by ${item.puzzle.creator} on ${createdDateString}`;
-        lastEditedTitle.innerText = `Last edited on ${lastEditDateString}`;
+        lastEditedTitle.innerText = `#${item.puzzle.id} : Last edited on ${lastEditDateString}`;
 
         // Create a span for the cell_concentration
         const cellConcSpan = document.createElement('span');
         cellConcSpan.textContent = `Cells : ${item.cell_concentration}%`;
-        cellConcSpan.classList.add('mx-3');
 
         // Create a span for the clues present value
         const cluesPresentSpan = document.createElement('span');
         cluesPresentSpan.textContent = `Clues : ${item.clues_present}/${item.total_clues}`;
-        cluesPresentSpan.classList.add('mx-3');
 
         // Create a span for the solutions present value
         const solutionsPresentSpan = document.createElement('span');
@@ -103,7 +95,7 @@ const renderThumbnails = (json) => {
         // Create a button to mark the puzzle completed
         const completedButton = document.createElement('button');
         completedButton.innerHTML = '<i class="fa-solid fa-flag-checkered"></i>';
-        completedButton.classList.add('btn', 'btn-success', 'm-2');
+        completedButton.classList.add('btn', 'btn-success', 'mr-2');
         completedButton.addEventListener('click', () => {
             markPuzzleCompleted(item.puzzle.id);
         });
@@ -111,7 +103,6 @@ const renderThumbnails = (json) => {
         // Create a bootstrap column to hold all the puzzle details
         const col = document.createElement('div');
         col.classList.add('col-12', 'col-md-4', 'text-center');
-        col.appendChild(title);
         col.appendChild(lastEditedTitle);
         col.appendChild(cluesPresentSpan);
         col.appendChild(solutionsPresentSpan);
@@ -119,6 +110,7 @@ const renderThumbnails = (json) => {
 
         // Create the grid thumbnail
         const container = createThumbnail(item.puzzle, item.clues);
+        container.classList.add('mt-2');
         container.addEventListener('click', (e) => {
             redirectToPuzzleEditor(item.puzzle.id);
         });
