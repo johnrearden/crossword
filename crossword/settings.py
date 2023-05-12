@@ -47,14 +47,16 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # CORS allowed domains
 CORS_ALLOWED_ORIGINS = [
-    'https://fruzzled.ie', 'https://www.fruzzled.ie'
+    'https://fruzzled.ie', 'https://www.fruzzled.ie', 'http://localhost:3000'
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # REST FRAMEWORK CONFIGURATION
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ]
 }
 REST_USE_JWT = True

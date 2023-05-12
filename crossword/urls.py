@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/accounts/', include('allauth.urls')),
     path('api/builder/', include('builder.urls')),
     path('api/client_requests/', include('crossword_client_api.urls')),
+    path('api/client_auth/', include('client_auth.urls')),
 ]
