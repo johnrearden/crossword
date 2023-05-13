@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'builder',
     'crossword_client_api',
+    'client_auth',
     'welcome',
 ]
 
