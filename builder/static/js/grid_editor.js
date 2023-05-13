@@ -326,7 +326,7 @@ const replaceCurrentClue = (str) => {
 
 // Fetch the definition for the clicked word and display it.
 const getDefinition = (word) => {
-    const url = `/api/builder/get_definition/${word}/`;
+    const url = `/api_backend/builder/get_definition/${word}/`;
     fetch(url).then(res => res.json())
         .then(json => {
             const results = json.results;
@@ -442,7 +442,7 @@ const saveCurrentPuzzle = () => {
         'clues': list,
         'grid': gridString,
     });
-    const url = '/api/builder/save_puzzle/';
+    const url = '/api_backend/builder/save_puzzle/';
     const options = {
         method: 'POST',
         body: payload,
@@ -517,7 +517,7 @@ const addEventListeners = () => {
 
         // Show the word matches modal
         const queryString = getWordFromCurrentClue();
-        const url = `/api/builder/query/${queryString}`;
+        const url = `/api_backend/builder/query/${queryString}`;
         const matchesDiv = document.getElementById('matches-div');
         matchesDiv.textContent = '';
         fetch(url).then(response => response.json())
