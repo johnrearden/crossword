@@ -33,8 +33,8 @@ SERVER_HOSTNAMES = os.environ['SERVER_HOSTNAMES'].split(',') or ''
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', *SERVER_HOSTNAMES]
 
 # ALLAUTH SETTINGS
-LOGIN_URL = '/api/accounts/login/'
-LOGIN_REDIRECT_URL = '/api/builder/'
+LOGIN_URL = '/api_backend/accounts/login/'
+LOGIN_REDIRECT_URL = '/api_backend/builder/'
 
 # Add HSTS header
 SECURE_HSTS_SECONDS = 30  # Unit is seconds; *USE A SMALL VALUE FOR TESTING!*
