@@ -432,6 +432,7 @@ const populateVirtualKeyboard = () => {
 
 const saveCurrentPuzzle = () => {
     console.log('saving puzzle');
+    window.scrollTo(0, 0);
     const list = [];
     for (let clue of grid.clues) {
         list.push(clue.convertToObject());
@@ -455,6 +456,7 @@ const saveCurrentPuzzle = () => {
     fetch(url, options)
         .then(response => response.json())
         .then(json => {
+            
             puzzleID = json.puzzle_id;
             const saveNotifier = document.getElementById('save-notifier');
             saveNotifier.classList.remove('d-none');
@@ -543,7 +545,7 @@ const addEventListeners = () => {
                     }
                     span.classList.add('match-word');
                     span.innerHTML = array.join('');
-                    
+
                     span.addEventListener('click', (event) => {
                         replaceCurrentClue(item);
                         const modalDiv = document.getElementById('matches-modal');
@@ -612,7 +614,13 @@ const addEventListeners = () => {
     document.getElementById('copy-word-button').addEventListener('click', (event) => {
         const word = getWordFromCurrentClue();
         navigator.clipboard.writeText(word)
-                 .then(() => console.log('current word copied to clipboard'));
+            .then(() => {
+                const copyNotifier = document.getElementById('copy-notifier');
+                copyNotifier.classList.remove('d-none');
+                setTimeout(() => {
+                    copyNotifier.classList.add('d-none');
+                }, 1000);
+            });
     });
 }
 
