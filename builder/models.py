@@ -73,7 +73,7 @@ class CrosswordClue(models.Model):
         a containing puzzle, a start location within that puzzle, and an
         orientation."""
     puzzle = models.ForeignKey(CrosswordPuzzle, on_delete=models.CASCADE,
-                               related_name='clues')
+                               related_name='clues', null=True)
     clue = models.CharField(max_length=1024, null=True, blank=True)
     clue_number = models.IntegerField(default=0)
     solution = models.CharField(max_length=127)

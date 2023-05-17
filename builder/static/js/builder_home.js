@@ -92,13 +92,39 @@ const renderThumbnails = (json) => {
             };
         })
 
-        // Create a button to mark the puzzle completed
-        const completedButton = document.createElement('button');
-        completedButton.innerHTML = '<i class="fa-solid fa-flag-checkered"></i>';
-        completedButton.classList.add('btn', 'btn-success', 'mr-2');
-        completedButton.addEventListener('click', () => {
-            markPuzzleCompleted(item.puzzle.id);
+        // Create a button to mark the puzzle reviewed
+        const reviewedButton = document.createElement('button');
+        reviewedButton.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Reviewed';
+        reviewedButton.classList.add('btn', 'btn-secondary', 'm-2');
+        reviewedButton.addEventListener('click', () => {
+            markPuzzleReviewed(item.puzzle.id);
         });
+
+        // Create a button to mark the puzzle released
+        const releasedButton = document.createElement('button');
+        releasedButton.innerHTML = '<i class="fa-solid fa-thumbs-up"></i> Released';
+        releasedButton.classList.add('btn', 'btn-success', 'm-2');
+        releasedButton.addEventListener('click', () => {
+            markPuzzleReleased(item.puzzle.id);
+        });
+
+        // Create a span to show complete status
+        const completedSpan = document.createElement('span');
+        completedSpan.innerText = item.puzzle.complete ? 'Completed' : 'Incomplete';
+        completedSpan.style.color = item.puzzle.complete ? 'green' : 'red';
+        completedSpan.classList.add('mx-2');
+
+        // Create a span to show reviewed status
+        const reviewedSpan = document.createElement('span');
+        reviewedSpan.innerText = item.puzzle.reviewed ? 'Reviewed' : 'Unreviewed';
+        reviewedSpan.style.color = item.puzzle.reviewed ? 'green' : 'red';
+        reviewedSpan.classList.add('mx-2');
+
+        // Create a span to show released status
+        const releasedSpan = document.createElement('span');
+        releasedSpan.innerText = item.puzzle.released ? 'Released' : 'Not released';
+        releasedSpan.style.color = item.puzzle.released ? 'green' : 'red';
+        releasedSpan.classList.add('mx-2');
 
         // Create a bootstrap column to hold all the puzzle details
         const col = document.createElement('div');
@@ -108,6 +134,14 @@ const renderThumbnails = (json) => {
         col.appendChild(solutionsPresentSpan);
         col.appendChild(cellConcSpan);
 
+        const readout = document.createElement('div');
+        readout.classList.add('col-12', 'col-md-4', 'text-center');
+        readout.appendChild(completedSpan);
+        readout.appendChild(reviewedSpan);
+        readout.appendChild(releasedSpan);
+
+        col.appendChild(readout);
+
         // Create the grid thumbnail
         const container = createThumbnail(item.puzzle, item.clues);
         container.classList.add('mt-2');
@@ -116,7 +150,8 @@ const renderThumbnails = (json) => {
         });
         col.appendChild(container);
         col.appendChild(deleteButton);
-        col.appendChild(completedButton);
+        col.appendChild(reviewedButton);
+        col.appendChild(releasedButton);
         col.appendChild(document.createElement('hr'));
 
         thumbnailHolder.appendChild(col);
@@ -174,8 +209,7 @@ const deletePuzzle = (id) => {
     const payload = JSON.stringify({
         'puzzle_id': id,
     });
-    console.log(`deleting puzzle ${id}`);
-    const url = '/api/builder/delete_puzzle/';
+    const url = '/api_backend/builder/delete_puzzle/';
     const options = {
         method: 'POST',
         body: payload,
@@ -194,6 +228,36 @@ const deletePuzzle = (id) => {
         });
 }
 
-const markPuzzleCompleted = (id) => {
-    console.log('todo');
+const markPuzzleReleased = (id) => {
+    const url = '/api_backend/builder/mark_puzzle_released/';
+    const data = JSON.stringify({ 'id': id });
+    const payload = {
+        method: 'POST',
+        body: data,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    }
+    fetch(url, payload)
+        .then(response => response.json())
+        .then(json => console.log(json));
+}
+
+const markPuzzleReviewed = (id) => {
+    const url = '/api_backend/builder/mark_puzzle_reviewed/';
+    const data = JSON.stringify({ 'id': id });
+    const payload = {
+        method: 'POST',
+        body: data,
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        }
+    }
+    fetch(url, payload)
+        .then(response => response.json())
+        .then(json => console.log(json));
 }

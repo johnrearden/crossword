@@ -15,4 +15,8 @@ urlpatterns = [
     path('create_new_puzzle/', views.CreateNewPuzzle.as_view(),
          name='create_new_puzzle'),
     path('delete_puzzle/', views.DeletePuzzle.as_view(), name='delete_puzzle'),
+    path('mark_puzzle_reviewed/', views.MarkPuzzleReviewed.as_view(),
+         name='mark_puzzle_reviewed'),
+    path('mark_puzzle_released/', views.MarkPuzzleReleased.as_view(),
+         name='mark_puzzle_released'),
 ]

@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -95,7 +96,7 @@ class DeletePuzzle(UserPassesTestMixin, APIView):
 class SavePuzzle(UserPassesTestMixin, APIView):
     def post(self, request, *args, **kwargs):
         clues_data = request.data['clues']
-        
+
         if request.data['puzzle_id']:
 
             # Update the puzzle grid's cells field
@@ -209,5 +210,48 @@ class CreateNewPuzzle(UserPassesTestMixin, APIView):
 
         return JsonResponse({'new_puzzle_id': puzzle.id})
 
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+class MarkPuzzleReviewed(UserPassesTestMixin, APIView):
+    def post(self, request):
+        id = request.data['id']
+        print(request.data)
+        puzzle = CrosswordPuzzle.objects.get(pk=id)
+        if puzzle.complete:
+            puzzle.reviewed = True
+            puzzle.save()
+            print('puzzle marked as reviewed')
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {'message': 'Can\'t mark reviewed - puzzle is incomplete'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+
+class MarkPuzzleReleased(UserPassesTestMixin, APIView):
+    def post(self, request):
+        id = request.data['id']
+        puzzle = CrosswordPuzzle.objects.get(pk=id)
+        if not puzzle.complete:
+            return Response(
+                status.HTTP_400_BAD_REQUEST,
+                {'message': 'Can\'t mark released - puzzle is incomplete'}
+            )
+        elif not puzzle.reviewed:
+            return Response(
+                status.HTTP_400_BAD_REQUEST,
+                {'message': 'Can\'t mark released - not reviewed yet'}
+            )
+        else:
+            puzzle.released = True
+            puzzle.save()
+            return Response(status=status.HTTP_200_OK)
+        
     def test_func(self):
         return self.request.user.is_staff
