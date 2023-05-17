@@ -41,7 +41,7 @@ class CrosswordPuzzle(models.Model):
     released = models.BooleanField(default=False)
 
     def __str__(self):
-        return (f'Puzzle by {self.creator} ({self.created_on}'
+        return (f'Puzzle ({self.id}) by {self.creator} ({self.created_on}'
                 f') ({self.grid.width}x{self.grid.height})')
 
 
@@ -72,8 +72,8 @@ class CrosswordClue(models.Model):
     """ A clue comprises a clue string, a solution string, a format string,
         a containing puzzle, a start location within that puzzle, and an
         orientation."""
-    puzzle = models.ForeignKey(CrosswordPuzzle, on_delete=models.SET_NULL,
-                               related_name='clues', null=True)
+    puzzle = models.ForeignKey(CrosswordPuzzle, on_delete=models.CASCADE,
+                               related_name='clues')
     clue = models.CharField(max_length=1024, null=True, blank=True)
     clue_number = models.IntegerField(default=0)
     solution = models.CharField(max_length=127)

@@ -108,9 +108,6 @@ class SavePuzzle(UserPassesTestMixin, APIView):
             # Remove any clues previously associated with this puzzle.
             CrosswordClue.objects.filter(puzzle=puzzle).delete()
 
-            # Save the updated puzzle
-            puzzle.save()
-
         else:
             grid_data = request.data['grid']
 
@@ -126,11 +123,13 @@ class SavePuzzle(UserPassesTestMixin, APIView):
             puzzle = CrosswordPuzzle.objects.create(
                 grid=grid,
                 creator=request.user,
+                commit=False,
             )
 
         # In both cases, we need to create new clues from the api call data
+        puzzle_complete = True
         for item in clues_data:
-            CrosswordClue.objects.create(
+            new_clue = CrosswordClue.objects.create(
                 puzzle=puzzle,
                 creator=request.user,
                 clue=item['clue'],
@@ -141,6 +140,12 @@ class SavePuzzle(UserPassesTestMixin, APIView):
                 start_row=item['start_row'],
                 start_col=item['start_col'],
             )
+            if len(new_clue.clue) == 0 or '#' in new_clue.solution:
+                puzzle_complete = False
+
+        # Save the crossword puzzle
+        puzzle.complete = puzzle_complete
+        puzzle.save()
 
         return JsonResponse({'puzzle_id': puzzle.id})
 
