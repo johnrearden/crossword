@@ -2,9 +2,10 @@ import { OPEN, CLOSED } from './crossword_grid.js';
 import { getCookie } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const url = 'get_recent_puzzles/20/';
-    fetch(url).then(response => response.json())
-        .then(json => renderThumbnails(json))
+
+    const puzzles = document.getElementById('id_puzzle').text;
+    const list = JSON.parse(puzzles);
+    renderThumbnails(list);
 });
 
 document.getElementById('new-puzzle-form').addEventListener('submit', (event) => {
@@ -54,108 +55,30 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
 });
 
 
-const renderThumbnails = (json) => {
-    const puzzleList = json.puzzles;
-    const thumbnailHolder = document.getElementById('thumbnail-holder');
+const renderThumbnails = (list) => {
+    const puzzleList = list;
     for (let item of puzzleList) {
 
-        console.log(item);
-
-        // Create a title each for the created and last_edited fields
-        const lastEditedTitle = document.createElement('h6');
-        lastEditedTitle.classList.add('text-center');
-        const lastEditDate = new Date(item.puzzle.last_edited);
-        const dayName = new Intl.DateTimeFormat("en-UK", { weekday: "short" }).format(lastEditDate);
-        const lastEditDateString = dayName + " " + lastEditDate.toLocaleString();
-        lastEditedTitle.innerText = `#${item.puzzle.id} : Last edited on ${lastEditDateString}`;
-
-        // Create a span for the cell_concentration
-        const cellConcSpan = document.createElement('span');
-        cellConcSpan.textContent = `Cells : ${item.cell_concentration}%`;
-
-        // Create a span for the clues present value
-        const cluesPresentSpan = document.createElement('span');
-        cluesPresentSpan.textContent = `Clues : ${item.clues_present}/${item.total_clues}`;
-
-        // Create a span for the solutions present value
-        const solutionsPresentSpan = document.createElement('span');
-        solutionsPresentSpan.textContent = `Solutions : ${item.solutions_present}/${item.total_clues}`;
-        solutionsPresentSpan.classList.add('mx-3');
-
-        // Create a button to delete the puzzle
-        const deleteButton = document.createElement('button');
-        deleteButton.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-        deleteButton.classList.add('btn', 'btn-danger', 'm-2');
-        deleteButton.addEventListener('click', () => {
-            if (confirm('Sure you want to delete it?')) {
-                deletePuzzle(item.puzzle.id);
-            };
-        })
-
-        // Create a button to mark the puzzle reviewed
-        const reviewedButton = document.createElement('button');
-        reviewedButton.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Reviewed';
-        reviewedButton.classList.add('btn', 'btn-secondary', 'm-2');
-        reviewedButton.addEventListener('click', () => {
-            markPuzzleReviewed(item.puzzle.id);
-        });
-
-        // Create a button to mark the puzzle released
-        const releasedButton = document.createElement('button');
-        releasedButton.innerHTML = '<i class="fa-solid fa-thumbs-up"></i> Released';
-        releasedButton.classList.add('btn', 'btn-success', 'm-2');
-        releasedButton.addEventListener('click', () => {
-            markPuzzleReleased(item.puzzle.id);
-        });
-
-        // Create a span to show complete status
-        const completedSpan = document.createElement('span');
-        completedSpan.innerText = item.puzzle.complete ? 'Completed' : 'Incomplete';
-        completedSpan.style.color = item.puzzle.complete ? 'green' : 'red';
-        completedSpan.classList.add('mx-2');
-
-        // Create a span to show reviewed status
-        const reviewedSpan = document.createElement('span');
-        reviewedSpan.innerText = item.puzzle.reviewed ? 'Reviewed' : 'Unreviewed';
-        reviewedSpan.style.color = item.puzzle.reviewed ? 'green' : 'red';
-        reviewedSpan.classList.add('mx-2');
-
-        // Create a span to show released status
-        const releasedSpan = document.createElement('span');
-        releasedSpan.innerText = item.puzzle.released ? 'Released' : 'Not released';
-        releasedSpan.style.color = item.puzzle.released ? 'green' : 'red';
-        releasedSpan.classList.add('mx-2');
-
-        // Create a bootstrap column to hold all the puzzle details
-        const col = document.createElement('div');
-        col.classList.add('col-12', 'col-md-4', 'text-center');
-        col.appendChild(lastEditedTitle);
-        col.appendChild(cluesPresentSpan);
-        col.appendChild(solutionsPresentSpan);
-        col.appendChild(cellConcSpan);
-
-        const readout = document.createElement('div');
-        readout.classList.add('col-12', 'col-md-4', 'text-center');
-        readout.appendChild(completedSpan);
-        readout.appendChild(reviewedSpan);
-        readout.appendChild(releasedSpan);
-
-        col.appendChild(readout);
-
         // Create the grid thumbnail
-        const container = createThumbnail(item.puzzle, item.clues);
+        const container = createThumbnail(item.json_puzzle, item.json_clues);
         container.classList.add('mt-2');
         container.addEventListener('click', (e) => {
-            redirectToPuzzleEditor(item.puzzle.id);
+            redirectToPuzzleEditor(item.json_puzzle.id);
         });
-        col.appendChild(container);
-        col.appendChild(deleteButton);
-        col.appendChild(reviewedButton);
-        col.appendChild(releasedButton);
-        col.appendChild(document.createElement('hr'));
+        const thumbnailHolder = document.getElementById(`thumbnail_${item.json_puzzle.id}`)
+        thumbnailHolder.appendChild(container);
 
-        thumbnailHolder.appendChild(col);
-        
+        // Add button event listeners
+        const id = item.json_puzzle.id;
+        document.getElementById(`delete-button-${id}`).addEventListener('click', (e) => {
+            deletePuzzle(id);
+        });
+        document.getElementById(`reviewed-button-${id}`).addEventListener('click', (e) => {
+            markPuzzleReviewed(id);
+        });
+        document.getElementById(`released-button-${id}`).addEventListener('click', (e) => {
+            markPuzzleReleased(id);
+        });
     }
 }
 
@@ -206,6 +129,9 @@ const createThumbnail = (puzzle, clues) => {
 }
 
 const deletePuzzle = (id) => {
+    if (!window.confirm(`Are you sure you want to delete #${id}`)) {
+        return;
+    }
     const payload = JSON.stringify({
         'puzzle_id': id,
     });
@@ -240,9 +166,18 @@ const markPuzzleReleased = (id) => {
             'X-CSRFToken': getCookie('csrftoken'),
         }
     }
-    fetch(url, payload)
-        .then(response => response.json())
-        .then(json => console.log(json));
+    try {
+        fetch(url, payload)
+            .then(response => {
+                if (!response.ok) {
+                    window.alert('Can\'t mark as release, the puzzle is not reviewed!');
+                } else {
+                    location.reload();
+                }
+            });
+    } catch (err) {
+        window.alert('Network error - please retry');
+    }
 }
 
 const markPuzzleReviewed = (id) => {
@@ -257,7 +192,17 @@ const markPuzzleReviewed = (id) => {
             'X-CSRFToken': getCookie('csrftoken'),
         }
     }
-    fetch(url, payload)
-        .then(response => response.json())
-        .then(json => console.log(json));
+    try {
+        fetch(url, payload)
+            .then(response => {
+                if (!response.ok) {
+                    window.alert('Can\'t mark as reviewed, the puzzle is not complete!');
+                } else {
+                    location.reload();
+                }
+            });
+    } catch (err) {
+        window.alert('Network error - please retry');
+    }
+    
 }

@@ -16,6 +16,5 @@ export const getCookie = (name) => {
             }
         }
     }
-    console.log(`csrf cookie : ${cookieValue}`);
     return cookieValue;
 };

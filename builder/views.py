@@ -14,7 +14,48 @@ from .utils import get_cell_concentration
 
 class BuilderHome(UserPassesTestMixin, View):
     def get(self, request):
-        return render(request, 'builder/builder_home.html')
+        puzzles = CrosswordPuzzle.objects \
+                                 .order_by('-last_edited')[:10]
+        puzzle_list = []
+        json_list = []
+        for puzzle in puzzles:
+            puzzle_serializer = CrosswordPuzzleSerializer(puzzle)
+            cell_concentration = get_cell_concentration(puzzle)
+
+            # Retrieve the clues for this crossword, and count the
+            # number of them that have a non-empty clue string. Also count the
+            # number of them that have a complete solution
+            clues = CrosswordClue.objects.filter(puzzle=puzzle)
+            clues_serializer = CrosswordClueSerializer(clues, many=True)
+            if not clues:
+                clue_count = 0
+                solution_count = 0
+            else:
+                clue_count = 0
+                solution_count = 0
+                for clue in clues:
+                    if len(clue.clue) > 0:
+                        clue_count += 1
+                    if '#' not in clue.solution:
+                        solution_count += 1
+            data = {
+                'puzzle': puzzle,
+                'clues': clues,
+                'cell_concentration': cell_concentration,
+                'clues_present': clue_count,
+                'solutions_present': solution_count,
+                'total_clues': len(clues),
+            }
+            json_data = {
+                'json_puzzle': puzzle_serializer.data,
+                'json_clues': clues_serializer.data,
+            }
+            puzzle_list.append(data)
+            json_list.append(json_data)
+        return render(
+            request,
+            'builder/builder_home.html',
+            {'puzzles': puzzle_list, 'json_list': json_list})
 
     def test_func(self):
         return self.request.user.is_staff
@@ -223,7 +264,9 @@ class MarkPuzzleReviewed(UserPassesTestMixin, APIView):
             puzzle.reviewed = True
             puzzle.save()
             print('puzzle marked as reviewed')
-            return Response(status=status.HTTP_200_OK)
+            return Response(
+                {'message': 'Puzzle marked as reviewed'},
+                status=status.HTTP_200_OK)
         else:
             return Response(
                 {'message': 'Can\'t mark reviewed - puzzle is incomplete'},
@@ -251,7 +294,9 @@ class MarkPuzzleReleased(UserPassesTestMixin, APIView):
         else:
             puzzle.released = True
             puzzle.save()
-            return Response(status=status.HTTP_200_OK)
-        
+            return Response(
+                {'message': 'Puzzle marked as released'},
+                status=status.HTTP_200_OK)
+
     def test_func(self):
         return self.request.user.is_staff

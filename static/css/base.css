@@ -62,3 +62,19 @@ a, a:hover {
     top: 3px;
     left: 3px;
 }
+
+/*  Builder home */
+.status-false {
+    color: #440000;
+    background-color: #dedede;
+    border: 1px solid darkgrey;
+    margin: 2px;
+}
+
+.status-true {
+    color: green;
+    background-color: #00ee0033;
+    font-weight: bold;
+    border: 1px solid darkgrey;
+    margin: 2px;
+}

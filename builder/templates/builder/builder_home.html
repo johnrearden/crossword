@@ -38,12 +38,60 @@
         <hr class="mt-5">
     </div>
     <h3>Work on recently edited puzzle</h3>
-    <div class="row" id="thumbnail-holder"></div>
+    <div class="row">
+        <div class="col text-center">
+            {% for item in puzzles%}
+            <hr>
+            <h5 class="fw-bold">#{{item.puzzle.id}} ({{ item.puzzle.last_edited }})</h6>
+            <div class="row text-center">
+                <div class="col border">
+                    <span>Clues {{ item.clues_present}}/{{ item.total_clues }}</span>
+                </div>
+                <div class="col border">
+                    <span>Sols {{ item.solutions_present }}/{{ item.total_clues }}</span>
+                </div>
+                <div class="col border">
+                    <span>Cells : {{ item.cell_concentration }}%</span>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col border {% if item.puzzle.complete %}status-true{% else %}status-false{% endif %}">
+                    Complete
+                </div>
+                <div class="col border {% if item.puzzle.reviewed %}status-true{% else %}status-false{% endif %}">
+                    Reviewed
+                </div>
+                <div class="col border {% if item.puzzle.released %}status-true{% else %}status-false{% endif %}">
+                    Released
+                </div>
+            </div>
+            
+            <!-- The holder for the js-generated clickable puzzle thumbnail -->
+            <div id="thumbnail_{{ item.puzzle.id }}"></div>
+
+            <div class="row my-3 text-center">
+                <div class="col">
+                    <button class="btn btn-primary" id="reviewed-button-{{ item.puzzle.id }}">Mark Reviewed</button>
+                    <button class="btn btn-success mx-2" id="released-button-{{ item.puzzle.id }}">Mark Released</button>
+                    <button class="btn btn-danger" id="delete-button-{{ item.puzzle.id }}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row" id="thumbnail-holder">
+        {% for item in puzzles%}
+        <h1>{{ item.puzzle.cells }}</h1>
+        {% endfor %}
+    </div>
 </div>
 
 {% endblock %}
 
 {% block postloadjs %}
 {{ block.super }}
+{{ json_list | json_script:"id_puzzle" }}
 <script src="{% static 'js/builder_home.js' %}" type="module"></script>
 {% endblock %}
