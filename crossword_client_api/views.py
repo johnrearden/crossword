@@ -11,7 +11,9 @@ class GetExample(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        crossword = CrosswordPuzzle.objects.order_by('-last_edited')[0]
+        crossword = CrosswordPuzzle.objects \
+            .order_by('-last_edited') \
+            .filter(released=True)[0]
         clues = CrosswordClue.objects.filter(puzzle=crossword)
         puzzle_serializer = CrosswordPuzzleSerializer(crossword)
         clue_serializer = CrosswordClueSerializer(clues, many=True)

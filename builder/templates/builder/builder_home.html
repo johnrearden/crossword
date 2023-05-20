@@ -10,7 +10,7 @@
 <div class="container-fluid mt-3">
     <div class="row justify-content-center">
         <div class="col-12">
-            <h3>Create New Puzzle</h3>
+            <h5>Create New Puzzle</h5>
             <form id="new-puzzle-form">
                 <div class="row mt-2">
                     <div class="col-2">
@@ -39,47 +39,47 @@
     </div>
 
     <!-- Overall puzzle stats -->
+    <h2 class="text-center">Stats</h2>
     <div class="row">
         <div class="col">
-            <h3># Total</h3>
+            <h5># Total</h5>
         </div>
         <div class="col">
-            <h3>{{ total_count }}</h3>
+            <h5>{{ total_count }}</h5>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <h3># Complete</h3>
+            <h5># Complete</h5>
         </div>
         <div class="col">
-            <h3>{{ completed_count }}</h3>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <h3># Reviewed</h3>
-        </div>
-        <div class="col">
-            <h3>{{ reviewed_count }}</h3>
+            <h5>{{ completed_count }}</h5>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <h3># Released</h3>
+            <h5># Reviewed</h5>
         </div>
         <div class="col">
-            <h3>{{ released_count }}</h3>
+            <h5>{{ reviewed_count }}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h5># Released</h5>
+        </div>
+        <div class="col">
+            <h5>{{ released_count }}</h5>
         </div>
     </div>
 
     <hr>
-    
-    <h3>Work on recently edited puzzle</h3>
+
     <div class="row">
         <div class="col text-center">
             {% for item in puzzles%}
             <hr>
-            <h3 class="fw-bold">#{{item.puzzle.id}}</h3>
+            <h5 class="fw-bold">#{{item.puzzle.id}}</h5>
             <h5 class="fw-bold mb-3">({{ item.puzzle.last_edited }})</h6>
             <div class="row text-center">
                 <div class="col border">
