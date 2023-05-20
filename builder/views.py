@@ -14,8 +14,13 @@ from .utils import get_cell_concentration
 
 class BuilderHome(UserPassesTestMixin, View):
     def get(self, request):
-        puzzles = CrosswordPuzzle.objects \
-                                 .order_by('-last_edited')[:10]
+        all_puzzles = CrosswordPuzzle.objects.all()
+        puzzles = all_puzzles.order_by('-last_edited')[:10]
+        completed_count = all_puzzles.filter(complete=True).count()
+        reviewed_count = all_puzzles.filter(reviewed=True).count()
+        released_count = all_puzzles.filter(released=True).count()
+        total_count = len(all_puzzles)
+        
         puzzle_list = []
         json_list = []
         for puzzle in puzzles:
@@ -55,7 +60,14 @@ class BuilderHome(UserPassesTestMixin, View):
         return render(
             request,
             'builder/builder_home.html',
-            {'puzzles': puzzle_list, 'json_list': json_list})
+            {
+                'puzzles': puzzle_list,
+                'json_list': json_list,
+                'total_count': total_count,
+                'completed_count': completed_count,
+                'reviewed_count': reviewed_count,
+                'released_count': released_count,
+            })
 
     def test_func(self):
         return self.request.user.is_staff
@@ -283,13 +295,13 @@ class MarkPuzzleReleased(UserPassesTestMixin, APIView):
         puzzle = CrosswordPuzzle.objects.get(pk=id)
         if not puzzle.complete:
             return Response(
+                {'message': 'Can\'t mark released - puzzle is incomplete'},
                 status.HTTP_400_BAD_REQUEST,
-                {'message': 'Can\'t mark released - puzzle is incomplete'}
             )
         elif not puzzle.reviewed:
             return Response(
+                {'message': 'Can\'t mark released - not reviewed yet'},
                 status.HTTP_400_BAD_REQUEST,
-                {'message': 'Can\'t mark released - not reviewed yet'}
             )
         else:
             puzzle.released = True

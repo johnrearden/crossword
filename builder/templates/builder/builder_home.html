@@ -37,12 +37,50 @@
         </div>
         <hr class="mt-5">
     </div>
+
+    <!-- Overall puzzle stats -->
+    <div class="row">
+        <div class="col">
+            <h3># Total</h3>
+        </div>
+        <div class="col">
+            <h3>{{ total_count }}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3># Complete</h3>
+        </div>
+        <div class="col">
+            <h3>{{ completed_count }}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3># Reviewed</h3>
+        </div>
+        <div class="col">
+            <h3>{{ reviewed_count }}</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h3># Released</h3>
+        </div>
+        <div class="col">
+            <h3>{{ released_count }}</h3>
+        </div>
+    </div>
+
+    <hr>
+    
     <h3>Work on recently edited puzzle</h3>
     <div class="row">
         <div class="col text-center">
             {% for item in puzzles%}
             <hr>
-            <h5 class="fw-bold">#{{item.puzzle.id}} ({{ item.puzzle.last_edited }})</h6>
+            <h3 class="fw-bold">#{{item.puzzle.id}}</h3>
+            <h5 class="fw-bold mb-3">({{ item.puzzle.last_edited }})</h6>
             <div class="row text-center">
                 <div class="col border">
                     <span>Clues {{ item.clues_present}}/{{ item.total_clues }}</span>
