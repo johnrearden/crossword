@@ -9,6 +9,11 @@ class Orientation(models.TextChoices):
     DOWN = 'DN', _('Down')
 
 
+class PuzzleType(models.TextChoices):
+    CROSSWORD = 'CSWD', _('Crossword')
+    CRANAGRAM = 'CRGM', _('Crannagram')
+
+
 class Grid(models.Model):
     """
     A framework for a puzzle, with variable width and height. A null square is
@@ -36,6 +41,8 @@ class CrosswordPuzzle(models.Model):
     last_edited = models.DateTimeField(auto_now=True)
     creator = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,
                                 related_name='grid_creator')
+    puzzle_type = models.CharField(max_length=4, choices=PuzzleType.choices,
+                                   default=PuzzleType.CROSSWORD)
     complete = models.BooleanField(default=False)
     reviewed = models.BooleanField(default=False)
     released = models.BooleanField(default=False)

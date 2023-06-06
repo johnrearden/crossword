@@ -20,7 +20,7 @@ class BuilderHome(UserPassesTestMixin, View):
         reviewed_count = all_puzzles.filter(reviewed=True).count()
         released_count = all_puzzles.filter(released=True).count()
         total_count = len(all_puzzles)
-        
+
         puzzle_list = []
         json_list = []
         for puzzle in puzzles:
