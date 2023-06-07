@@ -9,7 +9,7 @@ class GridAdmin(admin.ModelAdmin):
 
 class CrosswordPuzzleAdmin(admin.ModelAdmin):
     list_display = ('pk', 'grid', 'created_on', 'creator', 'last_edited',
-                    'complete', 'reviewed', 'released')
+                    'complete', 'reviewed', 'released', 'puzzle_type',)
     list_editable = ('grid', 'creator',
                      'complete', 'reviewed', 'released')
 

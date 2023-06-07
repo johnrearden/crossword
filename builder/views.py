@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin
 from .models import DictionaryWord, DictionaryDefinition, Grid
-from .models import CrosswordPuzzle, CrosswordClue
+from .models import CrosswordPuzzle, CrosswordClue, PuzzleType
 from .serializers import GridSerializer, CrosswordPuzzleSerializer, \
                          CrosswordClueSerializer
 from .utils import get_cell_concentration
@@ -250,6 +250,10 @@ class GetRecentPuzzles(UserPassesTestMixin, APIView):
 
 class CreateNewPuzzle(UserPassesTestMixin, APIView):
     def post(self, request):
+        if request.data['puzzle_type'] == 'CROSSWORD':
+            puzzle_type = PuzzleType.CROSSWORD
+        else:
+            puzzle_type = PuzzleType.CRANAGRAM
         grid = Grid.objects.create(
             creator=request.user,
             width=request.data['width'],
@@ -259,6 +263,7 @@ class CreateNewPuzzle(UserPassesTestMixin, APIView):
         puzzle = CrosswordPuzzle.objects.create(
             creator=request.user,
             grid=grid,
+            puzzle_type=puzzle_type,
         )
 
         return JsonResponse({'new_puzzle_id': puzzle.id})

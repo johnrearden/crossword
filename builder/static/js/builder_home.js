@@ -17,6 +17,7 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
     // Create a generic cellString with a uniform crosshatched pattern
     const rows = document.getElementById('row-count').value;
     const cols = document.getElementById('col-count').value;
+    const type = document.getElementById('puzzle-type').value;
     const array = [];
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -37,6 +38,7 @@ document.getElementById('new-puzzle-form').addEventListener('submit', (event) =>
         'width': cols,
         'height': rows,
         'cells': cellString,
+        'puzzle_type': type,
     });
     const options = {
         method: 'POST',
